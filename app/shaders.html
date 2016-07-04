@@ -1,0 +1,52 @@
+{% extends 'main-layout.html' %}
+
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+	<meta name="keywords" content="">
+	
+	{% block head %}
+	{% parent %}
+	{% endblock %}
+  </head>
+
+	<body>
+		<div class="container">
+			{% block content %}
+			{% parent %}
+			
+			<div class="container" style="padding-top: 60px">
+			<div>
+				<div id="main-div" style="max-width: 613px;">
+					<h2>Shader entry</h2>
+					<br/>
+					<div style="display: flex">
+						<div>
+							<textarea class="form-control" style="width: 400px" rows="20"></textarea>
+							<div>
+								<button id="button-save-entry" type="button" onclick="saveEntry()">
+								  <span class="icon-bar" style="height: 18px"><i class="icon-play"></i></span>
+								</button>
+							</div>
+						</div>
+						<div>
+							<input style="display: none">
+								<canvas id="parent0" width="100" height="100" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)" onclick="makeFullscreen()" style="width: 70%" ></canvas>
+							</input>
+							<p>Click on image for fullscreen, arrows and ctrl+arrows to control.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+			
+			{% endblock %}
+		</div>
+	</body>
+	
+	{% block footerscript %}
+	{% parent %}
+	{% endblock %}	
+</html>

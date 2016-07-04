@@ -1,0 +1,62 @@
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="title" content="Sample demo">
+		<meta name="description" content="PVM WebGL framework">
+		<meta name="author" content="PVM^2015">
+		<meta name="keywords" content="WebGL PVM framework">
+		
+		<!-- Base libs -->
+		<script type="text/javascript" src="glMatrix-0.9.5.min.js"></script>
+		<script type="text/javascript" src="utils.js"></script>	
+		<script type="text/javascript" src="shader-utils.js"></script>	
+		<script src="jquery-1.11.1.min.js"></script>
+		<!-- Entities -->
+		<script type="text/javascript" src="entities/entity-rotation-balls.js"></script>
+		<script type="text/javascript" src="entities/entity-background.js"></script>
+		<script type="text/javascript" src="entities/entity-background-interpolation.js"></script>
+		<script type="text/javascript" src="entities/entity-text-effect.js"></script>
+		<script type="text/javascript" src="entities/entity-logo.js"></script>
+		<script type="text/javascript" src="entities/entity-shadertoy.js"></script>
+		<script type="text/javascript" src="entities/fader.js"></script>
+		<script type="text/javascript" src="entities/animation-properties.js"></script>
+		<script type="text/javascript" src="entities/parametric-animation.js"></script>
+		<script type="text/javascript" src="entities/movement-effects.js"></script>
+		<script type="text/javascript" src="entities/text-adder.js"></script>
+		<!-- Libs -->
+		<script type="text/javascript" src="scenes/renderer.js"></script>
+		<script type="text/javascript" src="scenes/scene-sequencer.js"></script>
+		<!--<script type="text/javascript" src="scenes/time-steps-sequencer.js"></script>-->
+		<script type="text/javascript" src="scenes/repeating-scene-sequencer.js"></script>
+		<script type="text/javascript" src="scenes/scenes.js"></script>
+		<script type="text/javascript" src="fonts/font-style.js"></script>
+		<script type="text/javascript" src="fonts/font-style-bolded.js"></script>
+		<script type="text/javascript" src="fonts/font-bitmap.js"></script>
+		<script type="text/javascript" src="audio/webaudio-utils.js"></script>
+		<!-- Demo definition -->
+		<script type="text/javascript" src="textures/generated.js"></script>
+		<script type="text/javascript" src="demostmix.js"></script>
+		<script type="text/javascript" src="config.js"></script>
+		<script type="text/javascript" src="init.js"></script>
+	</head>
+
+	<body onload="startupDraw()" style="background-color: black">
+		<div>
+			<div id="divTextureCanvas" style="display: none">
+				<canvas id="textureCanvas" width="512" height="512"></canvas>
+				<img id="sample-image" src="textures/image.png" width="64" height="64">
+				<img id="pvm-letter-T" src="textures/imaget.png" width="64" height="64">
+				<img id="pvm-letter-N" src="textures/imagen.png" width="64" height="64">
+			</div>
+			<div id="demo-container" style="padding-top: 60px">
+				<p id="labelClick" style="color: gray">Loading, please wait...</p>
+				<div id="main-div">
+					<canvas id="glCanvas" onclick="toggleFullscreen()"></canvas>
+				</div>
+			</div>
+		</div>
+	</body>
+</html>

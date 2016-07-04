@@ -1,0 +1,25 @@
+Checking: 0 root
+Checking: 1 precision
+Checking: 2 declarator
+Checking: 3 type
+Checking: 4 declarator_item
+Checking: 5 identifier
+Checking: 6 declarator_item
+Checking: 7 identifier
+Checking: 8 function_declaration
+Checking: 9 type
+Checking: 10 scope
+Checking: 11 if_statement
+Checking: 12 binary
+Checking: 13 operator
+Checking: 14 float
+Checking: 15 float
+Checking: 16 return
+Checking: 17 float
+Checking: 18 return
+Checking: 19 float
+precision mediump float;
+varying float xx, yy;
+void main() {
+        if (2.0 < 3.0) return 1.0       return 2.0;
+}

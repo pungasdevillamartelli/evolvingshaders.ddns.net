@@ -1,0 +1,24 @@
+Checking: 0 root
+Checking: 1 precision
+Checking: 2 declarator
+Checking: 3 type
+Checking: 4 declarator_item
+Checking: 5 identifier
+Checking: 6 declarator_item
+Checking: 7 identifier
+Checking: 8 function_declaration
+Checking: 9 type
+Checking: 10 scope
+Checking: 11 return
+Checking: 12 binary
+Checking: 13 operator
+Checking: 14 identifier
+Checking: 15 function_call
+Checking: 16 identifier
+
+precision mediump float;
+
+varying float xx, yy;
+void main() {
+        return x * length(x);
+}

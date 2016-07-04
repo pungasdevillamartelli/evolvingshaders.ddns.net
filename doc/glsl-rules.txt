@@ -1,0 +1,251 @@
+
+------------------------------------------------------------
+
+- funciones
+	- podrían pasarsele si coincide con uno de los tipos existentes 
+	- podria descartarse para simplificar
+		
+- Relevar elementos glsl para construcción de parser y gramática
+	ivec2, ivec3, ivec4
+
+- constantes
+	int
+	float
+	
+- shadertoy, analizar requests para tomar cosas para pasar y mutar
+	- size chico
+	- poco tiempo de render
+	- que no encuentre distintas variables
+	- que no use buffers
+	
+- exclude:
+	texture3DProj
+	textureCube
+	shadow1D
+	texture1DLod
+	texture1DProjLod
+	texture2DLod
+	texture2DProjLod
+	textureCubeLod
+
+- LEXER: extraer componentes / variables: directamente se pasan como variables
+	x, y, z, w
+	r, g, b, a
+	s, t, p, q 
+ 
+- + - * / 
+	Ojo porque vec2 + float da vec2, idem float + vec2
+	Ver en que casos esto no se cumple
+	
+------------------------------------------------------------
+ 
+ float
+ vec2
+ vec3
+ vec4
+ int
+ ivec2
+ ivec3
+ ivec4
+ 
+------------------------------------------------------------	
+FACTS:
+-----
+
+** Usariamos 4 lenguajes distintos, uno para cada return type
+** Se podría usar uno solo y hacer que no varie el terminal root exp así no cambia el tipo
+
+start		exp
+exp			exp1	exp2	exp3	exp4
+
+exp1		f1-f1								
+			f1-f1-f1							
+			f1-f1-f1-f1							
+			f1-f2-f2							
+			f1-f3-f3							
+			f1-f4-f4
+			
+f1-f1		SIN f1
+			COS f1
+			TAN f1
+			... 
+			
+f1-f1-f1	ATAN f1 f1
+			POW  f1 f1
+			MIN  f1 f1
+			...
+...
+
+exp2		f2-f1-f1			
+			f2-f2				
+			f2-f2-f2			
+			f2-f2-f1	
+			f2-f2-f1-f1	
+			f2-f2-f2-f2		
+			f2-f2-f2-f1		
+			f2-f1-f1-f2	
+			f2-f1-f2
+
+f2-f1-f1	VEC2	f1 	f1
+f2-f2		SIN 	f2
+			COS 	f2
+			TAN 	f2
+			ATAN 	f2
+			...
+...
+f2-f2-f2	ATAN 	f2 	f2
+			POW		f2	f2
+			...
+...
+			
+exp2		
+exp3		
+exp4		
+f1			:f1
+f2			:f2
+f3			:f3
+f4			:f4
+
+
+** Caso minimo de problema:
+	SIN			f1-f1
+	SIN			f2-f2
+	REFLECT		f2-f2-f2-f1
+	REFLECT		f1-f1-f1-f1
+	REFLECT		f2-f2-f2
+	REFLECT		f1-f1-f1
+	
+
+------------------------------------------------------------
+
+for each exp
+	for each combination
+		-> Add combinations
+			EXP		COMBINATION
+
+for each exp
+	for each combination
+		for each function in combination
+			-> Add expanded production (without first part cuz it's returning type and it's defined implicitly by the grammar spec)
+				COMBINATION			FUNCTION
+
+------------------------------------------------------------
+
+exp1		f1-f1								SIN COS TAN ASIN ACOS ATAN RADIANS DEGREES EXP LOG EXP2 SQRT INVERSESQRT ABS CEIL FLOOR FRACT SIGN LENGTH NORMALIZE DFDX GENTYPE FWIDTH(
+			f1-f1-f1							ATAN POW MIN MAX MOD STEP DISTANCE DOT REFLECT
+			f1-f1-f1-f1							CLAMP MIX SMOOTHSTEP FACEFORWARD
+			f1-f2-f2							DISTANCE DOT
+			f1-f3-f3							DISTANCE DOT
+			f1-f4-f4							DISTANCE DOT
+
+exp2 		f2-f1-f1							VEC2
+			f2-f2								SIN COS TAN ASIN ACOS ATAN RADIANS DEGREES EXP LOG EXP2 SQRT INVERSESQRT ABS CEIL FLOOR FRACT SIGN LENGTH NORMALIZE DFDX GENTYPE FWIDTH(
+			f2-f2-f2							ATAN POW MIN MAX MOD STEP REFLECT
+			f2-f2-f1							MIN MAX MOD
+			f2-f2-f1-f1							CLAMP
+			f2-f2-f2-f2							CLAMP MIX SMOOTHSTEP FACEFORWARD
+			f2-f2-f2-f1							MIX REFLECT
+			f2-f1-f1-f2							SMOOTHSTEP
+			f2-f1-f2							STEP
+
+exp3		f3-f1-f1-f1							VEC3
+			f3-f3								SIN COS TAN ASIN ACOS ATAN RADIANS DEGREES EXP LOG EXP2 SQRT INVERSESQRT ABS CEIL FLOOR FRACT SIGN LENGTH NORMALIZE DFDX GENTYPE FWIDTH(
+			f3-f3-f3							ATAN POW MIN MAX MOD STEP REFLECT CROSS
+			f3-f3-f1							MIN MAX MOD
+			f3-f3-f1-f1							CLAMP
+			f3-f3-f3-f3							CLAMP MIX SMOOTHSTEP FACEFORWARD
+			f3-f3-f3-f1							MIX REFLECT
+			f3-f1-f1-f3							SMOOTHSTEP
+			f3-f1-f3							STEP
+			
+exp4		f4-f1-f1-f1-f1						VEC4
+			f4-f4								SIN COS TAN ASIN ACOS ATAN RADIANS DEGREES EXP LOG EXP2 SQRT INVERSESQRT ABS CEIL FLOOR FRACT SIGN LENGTH NORMALIZE DFDX GENTYPE FWIDTH(
+			f4-f4-f4							ATAN POW MIN MAX MOD STEP REFLECT
+			f4-f4-f1							MIN MAX MOD
+			f4-f4-f1-f1							CLAMP
+			f4-f4-f4-f4							CLAMP MIX SMOOTHSTEP FACEFORWARD
+			f4-f4-f4-f1							MIX REFLECT
+			f4-f1-f1-f4							SMOOTHSTEP
+			f4-f1-f4							STEP
+
+			
+------------------------------------------------------------	
+
+vec2 	float	float					VEC2
+vec3	float	float					VEC3
+vec4	float	float	float			VEC4
+	
+float	float							SIN COS TAN ASIN ACOS ATAN RADIANS DEGREES EXP LOG EXP2 SQRT INVERSESQRT ABS CEIL FLOOR FRACT SIGN LENGTH NORMALIZE DFDX GENTYPE FWIDTH(
+vec2	vec2
+vec3	vec3
+vec4	vec4
+
+float	float	float					ATAN POW
+vec2	vec2	vec2
+vec3	vec3	vec3
+vec4	vec4	vec4
+
+float	float	float					MIN MAX MOD
+vec2	vec2	vec2
+vec3	vec3	vec3
+vec4	vec4	vec4
+vec2	vec2	float
+vec3	vec3	float
+vec4	vec4	float
+
+float	float	float	float			CLAMP
+vec2	vec2	float	float		
+vec3	vec3	float	float		
+vec4	vec4	float	float		
+vec2	vec2	vec2	vec2		
+vec3	vec3	vec3	vec3		
+vec4	vec4	vec4	vec4		
+
+float	float	float	float			MIX
+vec2	vec2	vec2	float		
+vec3	vec3	vec3	float		
+vec4	vec4	vec4	float		
+vec2	vec2	vec2	vec2		
+vec3	vec3	vec3	vec3		
+vec4	vec4	vec4	vec4		
+
+float	float	float	float			SMOOTHSTEP
+vec2	vec2	vec2	vec2		
+vec3	vec3	vec3	vec3		
+vec4	vec4	vec4	vec4		
+vec2  	float 	float 	vec2
+vec3  	float 	float 	vec3
+vec4  	float 	float 	vec4
+
+float 	float	float					STEP
+vec2 	vec2	vec2				
+vec3 	vec3	vec3
+vec4 	vec4	vec4
+vec2 	float	vec2				
+vec3 	float	vec3	
+vec4 	float	vec4
+
+vec3	vec3	vec3					CROSS
+
+float	float	float					DISTANCE DOT
+float	vec2	vec2
+float	vec3	vec3
+float	vec4	vec4
+
+float	float	float	float			FACEFORWARD 
+vec2	vec2	vec2	vec2		
+vec3	vec3	vec3	vec3		
+vec4	vec4	vec4	vec4	
+
+float 	float	float					REFLECT
+vec2 	vec2	vec2				
+vec3 	vec3	vec3
+vec4 	vec4	vec4
+float 	float	float 	float		
+vec2 	vec2	vec2	float			
+vec3 	vec3	vec3	float	
+vec4 	vec4	vec4	float
+
+------------------------------------------------------------
+
+

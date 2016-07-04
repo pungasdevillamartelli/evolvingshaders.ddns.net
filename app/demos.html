@@ -1,0 +1,38 @@
+{% extends 'main-layout.html' %}
+
+<html lang="en"><head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="">
+    <meta name="author" content="">
+	<meta name="keywords" content="">
+	
+	{% block head %}
+	{% parent %}
+	{% endblock %}
+  </head>
+
+	<body>
+		<div class="container">
+			{% block content %}
+			{% parent %}
+			
+			<div class="container" style="padding-top: 60px">
+			<div>
+				<div id="main-div" style="max-width: 613px;">
+				
+				<h2>Demos</h2>
+				<br/>
+				<h4>PungasBlop</h4>
+				<a href="demo.html">Here</a>
+			</div>
+			
+			{% endblock %}
+		</div>
+	</body>
+	
+	{% block footerscript %}
+	{% parent %}
+	{% endblock %}	
+</html>

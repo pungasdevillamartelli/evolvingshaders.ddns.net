@@ -1,0 +1,50 @@
+precision mediump float;
+uniform float time;
+varying float xx, yy;
+
+vec2 iResolution = vec2(1024, 768);
+float sum( vec2 a ) { return a.x + a.y; }
+
+
+const int MAGIC_BOX_ITERS = 13;
+const float MAGIC_BOX_MAGIC = 0.76;
+
+float magicBox(vec3 p) {
+    p = 1.0 - abs(1.0 - mod(p, 2.0));
+    
+    float lastLength = length(p);
+    float tot = 0.0;
+    for (int i=0; i < MAGIC_BOX_ITERS; i++) {
+      p = abs(p)/(lastLength*lastLength) - MAGIC_BOX_MAGIC;
+      float newLength = length(p);
+      tot += abs(newLength-lastLength);
+      lastLength = newLength;
+    }
+
+    return tot;
+}
+
+const mat3 M = mat3(0.28862355854826727, 0.6997227302779844, 0.6535170557707412,
+                    0.06997493955670424, 0.6653237235314099, -0.7432683571499161,
+                    -0.9548821651308448, 0.26025457467376617, 0.14306504491456504);
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord ) {
+	vec2 modp = mod( floor( fragCoord.xy ), 2. );
+	float m = mod( sum( modp ), 2. ) * 1.5 - .5;
+    
+	vec2 uv = fragCoord.xy / iResolution.yy;
+    uv.x += time * .01;
+    vec3 p = 0.5*M*vec3(uv, 0.0);
+    float result = magicBox(p);
+    result *= 0.03;
+    result = clamp( result, 0., 1. );
+    if ( fragCoord.x < iResolution.x / 2. ) {
+        fragColor = vec4(vec3(min( result, fwidth( m * result ) / 3. )),1.0);
+    } else {
+		fragColor = vec4(vec3(result),1.0);
+    }
+}
+
+void main(void) {
+	mainImage(gl_FragColor, vec2(xx, yy));
+}

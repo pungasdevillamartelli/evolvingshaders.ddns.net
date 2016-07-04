@@ -1,0 +1,30 @@
+Checking: 0 root
+Checking: 1 precision
+Checking: 2 declarator
+Checking: 3 type
+Checking: 4 declarator_item
+Checking: 5 identifier
+Checking: 6 declarator_item
+Checking: 7 identifier
+Checking: 8 function_declaration
+Checking: 9 type
+Checking: 10 parameter
+Checking: 11 scope
+Checking: 12 return
+Checking: 13 binary
+Checking: 14 operator
+Checking: 15 identifier
+Checking: 16 function_call
+Checking: 17 identifier
+Checking: 18 function_declaration
+Checking: 19 type
+Checking: 20 scope
+
+
+precision mediump float;
+varying float xx, yy;
+float pete(vec3 x) {
+        return x * length(x);
+}
+void main() {
+}

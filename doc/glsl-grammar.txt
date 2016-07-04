@@ -1,0 +1,67 @@
+(defun create-glsl-grammar (functions)
+	nil)
+	
+(let ((productions))
+	(dolist (i list)
+		(let ((spec (car i))
+			(possible (cdr i)))
+			(dolist (j possible)
+				(add-productions-from-line productions i j)))))
+				
+(defmacro add-productions-from-line (productions i j)
+	"Add expanded productions for <i>, <j> into <productions>."
+	(let* ((arguments (expand-arguments i))
+		   (generated (expand-generated i arguments)))
+		(appendf productions (list (list :open j arguments :close) generated))))
+
+(defun expand-arguments (spec)
+	"Answer a list with production description values for <spec>."
+	(let ((splitted (string-split spec))
+		  (return-type (car splitted))
+		  (arguments (cdr splitted)))
+		nil))
+
+(defun expand-generated (i arguments)
+	"Answer expression to build parse tree when parsing for production <i>."
+	(list 'backquote (list i (arguments-placeholder arguments))))
+	
+	
+(defvar *glsl-exp-structure-data*
+'(	;; float functions
+	(f1-f1								SIN COS TAN ASIN ACOS ATAN RADIANS DEGREES EXP LOG EXP2 SQRT INVERSESQRT ABS CEIL FLOOR FRACT SIGN LENGTH NORMALIZE DFDX GENTYPE FWIDTH)
+	(f1-f1-f1							ATAN POW MIN MAX MOD STEP DISTANCE DOT REFLECT)
+	(f1-f1-f1-f1						CLAMP MIX SMOOTHSTEP FACEFORWARD)
+	(f1-f2-f2							DISTANCE DOT)
+	(f1-f3-f3							DISTANCE DOT)
+	(f1-f4-f4							DISTANCE DOT)
+	;; vec2 functions
+	(f2-f1-f1							VEC2)
+	(f2-f2								SIN COS TAN ASIN ACOS ATAN RADIANS DEGREES EXP LOG EXP2 SQRT INVERSESQRT ABS CEIL FLOOR FRACT SIGN LENGTH NORMALIZE DFDX GENTYPE FWIDTH)
+	(f2-f2-f2							ATAN POW MIN MAX MOD STEP REFLECT)
+	(f2-f2-f1							MIN MAX MOD)
+	(f2-f2-f1-f1						CLAMP)
+	(f2-f2-f2-f2						CLAMP MIX SMOOTHSTEP FACEFORWARD)
+	(f2-f2-f2-f1						MIX REFLECT)
+	(f2-f1-f1-f2						SMOOTHSTEP)
+	(f2-f1-f2							STEP)
+	;; vec3 functions
+	(f3-f1-f1-f1						VEC3)
+	(f3-f3								SIN COS TAN ASIN ACOS ATAN RADIANS DEGREES EXP LOG EXP2 SQRT INVERSESQRT ABS CEIL FLOOR FRACT SIGN LENGTH NORMALIZE DFDX GENTYPE FWIDTH)
+	(f3-f3-f3							ATAN POW MIN MAX MOD STEP REFLECT CROSS)
+	(f3-f3-f1							MIN MAX MOD)
+	(f3-f3-f1-f1						CLAMP)
+	(f3-f3-f3-f3						CLAMP MIX SMOOTHSTEP FACEFORWARD)
+	(f3-f3-f3-f1						MIX REFLECT)
+	(f3-f1-f1-f3						SMOOTHSTEP)
+	(f3-f1-f3							STEP)
+	;; vec4 functions		
+	(f4-f1-f1-f1-f1						VEC4)
+	(f4-f4								SIN COS TAN ASIN ACOS ATAN RADIANS DEGREES EXP LOG EXP2 SQRT INVERSESQRT ABS CEIL FLOOR FRACT SIGN LENGTH NORMALIZE DFDX GENTYPE FWIDTH)
+	(f4-f4-f4							ATAN POW MIN MAX MOD STEP REFLECT)
+	(f4-f4-f1							MIN MAX MOD)
+	(f4-f4-f1-f1						CLAMP)
+	(f4-f4-f4-f4						CLAMP MIX SMOOTHSTEP FACEFORWARD)
+	(f4-f4-f4-f1						MIX REFLECT)
+	(f4-f1-f1-f4						SMOOTHSTEP)
+	(f4-f1-f4							STEP)
+))

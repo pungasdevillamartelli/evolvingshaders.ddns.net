@@ -1,0 +1,11 @@
+precision mediump float;
+varying float xx, yy;
+
+void main(void) {	
+	float x = xx * 2.0 + sin(cos(yy));
+	float y = xx * 2.0 + sin(cos(xx));
+	float z = xx * 2.0 + sin(tan(yy));
+	x = y * z / sqrt(z);
+}
+
+

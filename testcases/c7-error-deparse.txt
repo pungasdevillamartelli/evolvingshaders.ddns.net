@@ -1,0 +1,12 @@
+OJO PORQUE ESTE CASO EL DEPARSE LE QUITA LOS ;
+==============================================
+
+precision mediump float;
+
+varying float xx, yy;
+void main() {
+        if (2.0 < 3.0) return 1.0;
+else
+return 2.0;
+
+}

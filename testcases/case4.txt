@@ -1,0 +1,7 @@
+precision mediump float;
+varying float xx, yy;
+
+void main(void) {
+	int a = 2;
+	int b = 3 + (a+=3);
+}

@@ -1,0 +1,117 @@
+DECISION: No se hace distincion ahora entre las funciones buildt in y no, por:
+	- simplicidad
+	- gpexplorer decide si puede procesar el cacho o no
+	- luego se agregan las funciones y se extiende lo que puede parsear
+
+-------------------------------------------------------------------------------------------------------------
+EXPRESSIONS:
+-----------
+
+Expresion: toma el hijo previendo =, *=, ...		OK ESTOS TODOS
+	Checking: 15 expression					x
+	Checking: 16 binary
+	
+	Checking: 15 expression					x
+	Checking: 16 binary
+
+	Checking: 13 declarator_item			x
+	Checking: 14 identifier
+	Checking: 15 binary
+	
+	Checking: 13 declarator_item			x
+	Checking: 14 identifier
+	Checking: 15 function_call
+	
+	Checking: 13 declarator_item			x
+	Checking: 14 identifier
+	Checking: 15 float
+		
+	Checking: 13 declarator_item			x
+	Checking: 14 identifier
+	Checking: 15 vec3						
+	
+float x = sin(xx);									OK
+	Checking: 13 declarator_item			x
+	Checking: 14 identifier
+	Checking: 15 function_call
+
+float x = 2.0 + 3.0;								OK
+	Checking: 13 declarator_item			x
+	Checking: 14 identifier
+	Checking: 15 binary
+	Checking: 16 operator
+	Checking: 17 float
+	Checking: 18 float	
+
+float x = funcion(2.0 * 2.0);						OK
+	Checking: 13 declarator_item			x
+	Checking: 14 identifier
+	Checking: 15 function_call
+	Checking: 16 binary
+	Checking: 17 operator
+	Checking: 18 float
+	Checking: 19 float	
+	
+float x = sin(2.0);									OK
+	Checking: 13 declarator_item			x			aca y puede tomar el tipo del declarado si se quiere para comparar
+	Checking: 14 identifier
+	Checking: 15 function_call
+	Checking: 16 float	
+	
+x = sin(2.0)										OK
+	Checking: 15 expression					x			
+	Checking: 16 binary						x			aca y se fija el =
+	Checking: 17 operator
+	Checking: 18 identifier
+	Checking: 19 float
+	Checking: 20 float
+
+z += 2.0;											OK
+	Checking: 15 expression					x
+	Checking: 16 binary						x
+	Checking: 17 operator
+	Checking: 18 identifier
+	Checking: 19 float
+	
+pete(3.0 * x);										OK
+	Checking: 15 expression					x
+	Checking: 16 function_call				x	incluida
+	Checking: 17 binary						
+
+pete((3.0 * x) * sin(x));							OK
+	Checking: 15 expression					x
+	Checking: 16 function_call				x	no incluida
+	Checking: 17 binary						
+	Checking: 18 operator
+	Checking: 19 binary
+	Checking: 20 operator
+	Checking: 21 float
+	Checking: 22 identifier
+	Checking: 23 function_call
+	Checking: 24 identifier
+	
+			
+VARIABLE DECLARATION
+--------------------
+
+float xx, yy, zz;							OK
+
+float rr=2.0, ss=3.0, tt;					OK
+
+return length(x);							FALTA
+
+vec3 x = vec4(....).rgb 					DA ERROR AL PARSEAR ESTO, no es valido en GLSL
+											Nunca deberia aparecer.
+
+pete(3.0 * x);								OK, saca lo de adentro misterioramente.
+	
+vec3 x = r.xyz;								FALTA
+
+float x = v.r;
+
+
+
+
+
+float x = vec4(0.0, 0.0, 0.0, 1.0).r;
+

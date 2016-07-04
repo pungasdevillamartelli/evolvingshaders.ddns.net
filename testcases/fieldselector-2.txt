@@ -1,0 +1,21 @@
+
+void main(void) {
+	vec2 b;
+	floor(b.yx).xy;
+}
+
+
+Checking: 0 root
+Checking: 1 function_declaration
+Checking: 2 type
+Checking: 3 scope
+Checking: 4 expression
+Checking: 5 binary							DSL: (floor v)
+Checking: 6 operator
+Checking: 7 identifier
+Checking: 8 postfix
+Checking: 9 field_selector
+Checking: 10 function_call					DSL: (selectorfix (floor v) 12)
+Checking: 11 postfix
+Checking: 12 field_selector
+Checking: 13 identifier						DSL: (selectorfix v 2)

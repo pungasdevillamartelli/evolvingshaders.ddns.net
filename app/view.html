@@ -1,0 +1,107 @@
+{% extends 'main-layout.html' %}
+<title>{% block title %}View shader{% endblock %}</title>
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<meta name="keywords" content="lisp, rgb, texture generation, webgl">
+		
+		{% block head %}
+		{% parent %}
+		<script type="text/javascript" src="utils.js"></script>	
+		<script type="text/javascript" src="shader-utils.js"></script>			
+		<script type="text/javascript" src="initView.js"></script>
+		<script type="text/javascript" src="entities/entity-background.js"></script>
+		<script type="text/javascript" src="entities/entity-shader.js"></script>
+		<script type="text/javascript" src="scenes/scene-sequencer.js"></script>
+		<script type="text/javascript" src="scenes/repeating-scene-sequencer.js"></script>
+		<script type="text/javascript" src="scenes/renderer.js"></script>
+		<script type="text/javascript" src="scenes/scenes.js"></script>
+		<script type="text/javascript" src="audio/webaudio-utils.js"></script>
+		<script type="text/javascript" src="view.js"></script>
+		{% endblock %}
+	</head>
+
+	{% block content %}
+	{% parent %}
+	<div>
+		<div id="divTextureCanvas" style="display: none">
+			<canvas id="textureCanvas" width="512" height="512"></canvas>
+		</div>
+		<div id="demo-container" style="padding-top: 60px">
+			<!--<p id="labelClick" style="color: gray">Loading, please wait...</p>-->
+			<div id="main-div">
+				<canvas id="glCanvas" onclick="toggleFullscreen()"></canvas>
+			</div>
+		</div>
+	</div>
+	{% endblock %}
+
+	{% block mainscript %}
+	{% parent %}
+	<script src="jquery-1.11.1.min.js"></script>
+	<script src="bootstrap.min.js"></script>
+	<script src="webgl-utils.js"></script>
+	<script src="webgl-entities.js"></script>	
+	<script src="entity-shader-utils.js"></script>
+	
+	<script>		
+		var entity = #ENTITY#;
+		var entityView = getProcessedShader(entity);
+		var fragmentErrorShaderSource;
+		var objectErrorFile = "/example-scene-mutate-error.c";
+		
+		function startup () { 
+			//startupDraw(); 
+			
+			// Read error shader
+			$.ajax({
+				type: 'GET',
+				url: objectErrorFile,
+				data: { },
+				async: false,
+				dataType: "text",
+				success: function(data) { fragmentErrorShaderSource = data; },
+				error: function(data) { console.log('Error shader not found'); }
+			});
+			
+			setInterval(function() {
+				var element = 'glCanvas';
+				if (entity != null)
+					initializeAndDraw(element);
+			}, 150);
+		}
+				
+		function getProcessedShader(entity) {
+			var result = entity.code;
+			for (var i=0; i< entity.functions.length; i++) {
+				// #FIX: old versions fix
+				if ((entity.functions[i].value.indexOf("X") > 0) ||
+					(entity.functions[i].value.indexOf("YY") > 0) ||
+					(entity.functions[i].value.indexOf("TIME") > 0) ||
+					(entity.functions[i].value.indexOf("VEC") > 0))
+				result = result.replace(entity.functions[i].definition, 
+										entity.functions[i].value.toLowerCase());
+				else
+				result = result.replace(entity.functions[i].definition, 
+										entity.functions[i].value);
+			}
+			return result;
+		}
+		
+		// Scene graphics
+		function initializeAndDraw(canvasId, code) {
+			initWebGLSceneShaderMutation(canvasId, entity);
+			drawEntityImage();
+		}		
+	</script>
+	{% endblock %}
+	
+	{% block footerscript %}
+	{% parent %}
+	{% endblock %}
+</html>

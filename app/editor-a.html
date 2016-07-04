@@ -1,0 +1,909 @@
+{% extends 'mutation-layout.html' %}
+
+{% block title %} GLSL Mutation editor {% endblock %}
+
+{% block head %}
+{% parent %}
+	<style>
+		.label {width: 60px }
+	</style>
+{% endblock %}	
+
+
+{% block body %}
+<body onload="startupDraw()">
+{% endblock %}
+
+{% block content %}
+{% parent %}		
+	<div class="container" style="padding-top: 60px; width: 950px">
+		<div id="main-div" style="border-left: 1px solid lightgray; display: flex">
+			<div style="width: 578px">
+				<div id="container-pdiv" class="view-container" style="margin-bottom: 5px; display">
+				<div>
+					<canvas id="parent0" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="parent1" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="parent2" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="parent3" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					</div>
+				</div>
+				<div>
+					<input type="submit" value="Operate" onclick="operate()" style="width: 35%; background-color: #5cb85c"/>			
+					<input type="button" value="Operate with gallery" onclick="directedCrossoverFromGallery()" style="width: 35%; background-color: #5cb85c;"/>
+					<input type="submit" value="Break" onclick="setShaderBroke()" style="width: 20%; background-color: #5cb85c"/>			
+				</div>
+
+				<div id="container-cdiv" class="view-container" style="margin-top: 10px">
+					<canvas id="child0" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="child1" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="child2" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="child3" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="child4" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="child5" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="child6" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="child7" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
+					<canvas id="child8" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="child9" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>			
+					<canvas id="child10" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					<canvas id="child11" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
+				</div>
+			</div>
+			<div id="comments-div" class="view-container" style="border: 1px solid lightgray;">
+				<div class="modal fade" id="imageModal" role="dialog" aria-hidden="true" >
+				  <div class="modal-dialog">
+					<div class="modal-content">
+					  <div id="modal-container" class="modal-body" style="width: 100%; display: block">
+						<input id="modal-text" rows="20">
+						<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setShaderValue()" >set</button>
+					  </div>
+					</div>
+				  </div>
+				</div>
+				<form>
+					<div style="width: 245px">
+						<div style="margin-top: 20px; padding-left: 15px">
+							<div style="display: block">	
+								<div>
+									<div class="label">Objective</div>
+									<div style="display: flex; height: 30px; padding-bottom: 7px">
+										<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setShaderPopup()" style="width: 35px">...</button>
+										<div style="width: 5px"></div>
+										<select id="fitness-select" style="width: 180px" disabled>
+											<option value="Scene sample">Scene sample</option>
+										</select>
+									</div>
+								</div>
+								<div>
+									<div class="label">Evaluator</div>
+									<div style="display: flex; height: 30px; padding-bottom: 7px">
+										<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setEvaluatorPopup()" style="width: 35px">...</button>
+										<div style="width: 5px"></div>
+										<select id="fitness-select" style="width: 180px">
+											<option value="None">None</option>
+											<option value="Smooth">Smooth</option>
+											<option value="Smooth">Blue</option>
+										</select>
+									</div>
+								</div>
+								<div style="display: flex">
+									<div style="display: block">
+										<div class="label">Max size</div>	
+										<input id="input-max-size" style="width: 55px" type="text" value="12"/>
+									</div>
+									<div style="display: block">
+										<div class="label">Brk factor</div>	
+										<input id="input-break-factor" style="width: 55px" type="text" value="20"/>
+									</div>									
+									<div style="display: block">
+										<div class="label">Mutations</div>	
+										<input id="input-mutations" style="width: 55px" type="text" value="1" disabled/>
+									</div>									
+								</div>
+								<div style="display: flex">
+									<div>
+										<div class="label">Mode</div>	
+										<select style="width: 100px" id="fitness-select" value="operation">
+											<option value="operation">Operation</option>
+											<option value="inspect">Inspect</option>
+											<option value="search">Search</option>
+										</select>
+									</div>
+									<div>
+										<div class="label">Function</div>	
+										<select style="width: 100px" id="function-select" value="all">
+											<option value="all">All</option>
+										</select>
+									</div>									
+								</div>
+								<div>
+									<div class="label">Max time</div>	
+									<input type="text" value="1" disabled/>
+								</div>	
+								<div>
+									<button type="button" class="btn btn-default" onclick="resetParents()" style="width: 51.0%">Reset parents</button>
+									<button type="button" class="btn btn-default" onclick="resetTime()" style="width: 42.0%">Reset time</button>
+								</div>
+								<div>
+									<br/>
+									<div class="label" style="width: 70px">Expression</div>	
+									<textarea id="hoverExpression" style="height: 160px"></textarea>
+								</div>									
+							</div>			
+						</div>
+					</div>
+				</form>
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block mainscript %}
+<script src="jquery-1.11.1.min.js"></script>
+<script src="bootstrap.min.js"></script>
+<script src="mutation-strategy.js"></script>
+<!--<script src="enitity-shader-utils.js"></script>-->
+
+<script>		
+	var entitiesDictionary = {};
+	var childCount = 12, parentCount = 4;
+	// #TODO: add a generic shader class (switchs en draw, init, etc.)
+	var objectClass = "entity-shader",
+		objectFile = "/example-scene-mutate-a.c", 
+		objectErrorFile = "/example-scene-mutate-error.c",
+		objectCode = "",
+		objectCodeBrokered = "",
+		fragmentShaderEffectSrc,
+		fragmentErrorShaderSource;
+	
+
+	function replaceAll(find, replace, str) {
+		return str.replace(new RegExp(find, 'g'), replace);
+	}
+
+	function operate() {
+		for (var i=0; i< childCount; i++) {
+			var canvasId = "child" + i.toString();
+			
+			if (Math.floor(Math.random() * 10) < 5) {
+				var parentCanvasId = "parent" + Math.floor(Math.random() * parentCount).toString();
+				createFunctionCallMutateOn( 
+					parentCanvasId,
+					canvasId,
+					getFunctionIndex(parentCanvasId));
+			}
+			else {
+				var info = selectCrossoverParents();
+				var parentCanvasIdA = info[0][1];
+				var parentFunctionIdA = info[0][0];
+				var parentCanvasIdB = info[1][1];
+				var parentFunctionIdB = info[1][0];
+				
+				createFunctionCallCrossoverOn(
+					parentCanvasIdA, 
+					parentCanvasIdB,
+					canvasId,
+					parentFunctionIdA,
+					parentFunctionIdB);
+			}
+		}
+	}
+
+	function selectCrossoverParents() {
+		var table = {};
+		var result = [];
+		
+		for (var i=0; i< parentCount; i++) {
+			var canvasId = "parent" + i.toString();
+			
+			// Make a dictionary with variables and return type as a key
+			for (var j=0; j< entitiesDictionary[canvasId].functions.length; j++) {
+				var fun = entitiesDictionary[canvasId].functions[j];
+				var key = fun.type + "-" + fun.vars;
+				
+				if (table[key] == null)
+					table[key] = [];
+				table[key].push([j, canvasId]);
+			}
+		}
+	
+		// Get a pair of functions with the same key
+		for (var k in table) 
+			if (table[k].length > 2) 
+				result.push(table[k]);
+		// Select random index
+		var index = Math.floor(Math.random() * result.length);
+		// Select random pair
+		var list = shakedList(result[index].length);
+		
+		return [result[index][list[0]], result[index][list[1]]];
+	}
+		
+	function shakedList(count) {
+		var value = [];
+		for (var i=0; i< count; i++)
+			value.push(i);
+		shake(value);
+		return value;
+	}
+	
+	function shake(list) {
+		for (var i=0; i< list.length; i++) {
+			var a = Math.floor(Math.random() * list.length);
+			var b = Math.floor(Math.random() * list.length);
+			var aux = list[a];
+			list[a] = list[b];
+			list[b] = aux;
+		}
+	}
+
+	function allowDrop(ev) {
+		ev.preventDefault();
+	}
+
+	function drag(ev) {
+		ev.dataTransfer.setData("Text", JSON.stringify(entitiesDictionary[ev.target.id]));
+	}
+
+	function drop(ev) {
+		ev.preventDefault();
+		var result = JSON.parse(ev.dataTransfer.getData("Text"));
+		entitiesDictionary[ev.target.id] = result;
+		if (result == "default") alert("Default error");
+		initializeAndDraw(ev.target.id);
+	}
+	
+	function resetParents() {
+		for (var i=0; i< 1; i++) {
+			var canvasId = "parent" + i.toString();
+			createFunctionCallCreateDefault(canvasId);
+		}
+	}
+	
+	function resetTime() {
+		resetTimer();
+		
+		for (var i=0; i< parentCount; i++) {
+			if (entitiesDictionary["parent" + i])
+				initializeAndDraw("parent" + i);
+		}
+			
+		for (var i=0; i< childCount; i++) {
+			if (entitiesDictionary["child" + i])
+				initializeAndDraw("child" + i);
+		}
+	}
+	
+	function startupDraw() {
+		// Read initial shader
+		$.ajax({
+			type: 'GET',
+			url: objectFile,
+			data: { },
+			async: false,
+			dataType: "text",
+			success: function(data) { 
+				$("#modal-text")[0].value = data;
+				objectCode = data;
+				fragmentShaderEffectSrc = data; 
+				for (var i=0; i< 1; i++) {
+					var canvasId = "parent" + i.toString();
+					createFunctionCallCreateDefault(canvasId);
+				}
+			},
+			error: function(data) { console.log('Source shader not found'); }
+		});
+		
+		// Read error shader
+		$.ajax({
+			type: 'GET',
+			url: objectErrorFile,
+			data: { },
+			async: false,
+			dataType: "text",
+			success: function(data) { fragmentErrorShaderSource = data; },
+			error: function(data) { console.log('Error shader not found'); }
+		});
+		
+		// Animation hover
+		function isHover(e) {
+		  return (e.parentElement.querySelector(':hover') === e);
+		}
+		
+	/*	window.requestAnimationFrame(function () { 
+			for (var i=0; i< parentCount; i++) {
+				var element = 'parent' + i.toString();
+				if (isHover(document.getElementById(element))) {
+					if (entitiesDictionary[element] != null)
+						initializeAndDraw(element);
+					return;
+				}
+			}
+			
+			for (var i=0; i< childCount; i++) {
+				var element = 'child' + i.toString();
+				if (isHover(document.getElementById(element))) {
+					if (entitiesDictionary[element] != null)
+						initializeAndDraw(element);
+					return;
+				}
+			}
+		}); */
+		
+		function functionsDescriptionText(entity) {
+			var result = "";
+			for (var i in entity.functions) 
+				result += entity.functions[i].value + "\n\n";
+			return result;
+		}
+		
+		setInterval(function() {
+			for (var i=0; i< parentCount; i++) {
+				var element = 'parent' + i.toString();
+				if (isHover(document.getElementById(element))) {
+					if (entitiesDictionary[element] != null) {
+						document.getElementById("hoverExpression").innerHTML = functionsDescriptionText(entitiesDictionary[element]);
+						initializeAndDraw(element);
+					}
+					return;
+				}
+			}
+			
+			for (var i=0; i< childCount; i++) {
+				var element = 'child' + i.toString();
+				if (isHover(document.getElementById(element))) {
+					if (entitiesDictionary[element] != null) {
+						document.getElementById("hoverExpression").innerHTML = functionsDescriptionText(entitiesDictionary[element]);
+						initializeAndDraw(element);
+					}
+					return;
+				}
+			}
+		}, 150);
+	}
+	
+	function createFunctionCallCreateDefault(canvasId) {
+		//createFunctionGeneric(name, { entityClass: objectClass }, "/getWithCriteria");
+		
+		// Initial default scene
+		entitiesDictionary[canvasId] = {
+			code: objectCode,
+			entityClass: objectClass,
+			functions: parseFunctions(objectCode)
+		};
+		ensureTranslatedValue(entitiesDictionary[canvasId]);
+		initializeAndDraw(canvasId);
+	}
+	
+	function createFunctionCallMutateOn(name, canvasId, functionIndex) {
+		var maxSize = document.getElementById("input-max-size").value;
+		var entity = entitiesDictionary[name];
+		
+		createFunctionGeneric(
+			canvasId,	
+			{ language: "glsl-dsl", 
+			  maxSize: maxSize, 
+			  vars: entitiesDictionary[name].functions[functionIndex].vars,
+			  entityClass: entitiesDictionary[name].entityClass, 
+			  entity: entitiesDictionary[name].functions[functionIndex].valueDSL
+			}, 
+			 "/mutateWithVars",
+			 entity, 
+			 functionIndex);
+	}
+	
+	function createFunctionCallCrossoverOn(nameA, nameB, canvasId, functionIndexA, functionIndexB) {
+		var maxSize = document.getElementById("input-max-size").value;	
+		var entity = entitiesDictionary[nameA];
+		
+		createFunctionGeneric(
+			canvasId,
+			{ language: "glsl-dsl", 
+			  maxSize: maxSize,	
+			  vars: entitiesDictionary[nameA].functions[functionIndexA].vars,
+			  expA: entitiesDictionary[nameA].functions[functionIndexA].valueDSL, 
+			  expB: entitiesDictionary[nameB].functions[functionIndexB].valueDSL },
+			"/crossoverWithVars",
+			entity, 
+			functionIndexA);
+	}
+	
+
+/*	function createFunctionCallCreateRandom(name, functionIndex) {
+		var maxSize = document.getElementById("input-max-size").value;
+		var entity = entitiesDictionary[name];
+		
+		createFunctionGeneric(
+			name,	
+			{ language: "glsl-dsl", 
+			  maxSize: maxSize 
+			}, 
+			"/createRandom",
+			entity,
+			functionIndex);
+	}	
+	
+	function createFunctionCrossoverFromLib(name, canvasId) {
+		var maxSize = document.getElementById("input-max-size").value;
+		var xmlHttp = null;
+		var entity = entitiesDictionary[name];
+		
+		xmlHttp = new XMLHttpRequest();
+		xmlHttp.open("GET", "/getWithCriteria?entityClass=" + objectClass, false);
+		xmlHttp.send(null);
+		
+		if (xmlHttp.status === 200) { 
+			var newElementData = xmlHttp.responseText.split("|");
+			createFunctionGeneric(
+				canvasId,
+				{ language: "glsl-dsl", 
+				  maxSize: maxSize, 
+				  objectDataA: entity.functions[functionIndex], 
+				  objectDataB: newElementData[1]},
+				"/messageCrossover",
+				entity,
+				functionIndex);
+		}
+	}  */
+	
+	function getDelimiters(text, delimiter) {
+		var start = 0, result, results = [];
+		
+		while (true) {
+			result = text.indexOf(delimiter, start);
+			if (result >= 0) {
+				results.push(result);
+				start = result + 1;
+			}
+			else
+				break;
+		}
+		
+		return results;
+	}
+	
+	function getStartDelimiters(text) {
+		return getDelimiters(text, "#{");
+	}
+	
+	function getEndDelimiters(text) {
+		return getDelimiters(text, "}#");
+	}
+	
+	function parseVars(str) {
+		var result = str.substr(str.indexOf("((") + 1, str.length - 1);
+		return result.split("))")[0].trim() + ")";
+	}
+	
+	function parseFunction(buffer) {
+		var text = buffer.substring(2, buffer.length-2);
+		// #{distortion((vvv0 float xx) (vvv2 float time)) :: EXPONE :: sin(x * 100.0) :: (sin (* x 100.0)) }#"
+		var result = {};
+		var parts = text.split("::");
+		result.name = parts[0].split("(")[0];
+		result.vars = parseVars(parts[0]);
+		result.language = parts[1].trim();
+		result.value = parts[2].trim();
+		result.valueDSL = parts[3].trim();
+		result.definition = buffer;
+		return result;
+	}
+	
+	function parseFunctions(text) {
+		var startDelimiters = getStartDelimiters(text);
+		var endDelimiters = getEndDelimiters(text);
+		var functions = [];
+		
+		for (var i=0; i< startDelimiters.length; i++) {
+			var buffer = "";
+			for (var j=startDelimiters[i]; j< endDelimiters[i]+2; j++)
+				buffer += text[j];
+			functions.push(parseFunction(buffer));
+		}
+		
+		return functions;
+	}
+	
+	function deepCopy(oldObject) {
+		return jQuery.extend(true, {}, oldObject);
+	}
+	
+	function createFunctionGeneric(canvasId, arguments, message, originalEntity, functionIndex) {
+		//var target = new MutationTarget(originalEntity, functionIndex);
+		
+		$.ajax({
+			type: 'GET',
+			url: message,
+			data: arguments,
+			dataType: "text",
+			success: function(data) {
+				var result = data.split("|");
+				entitiesDictionary[canvasId] = { };
+				
+				// #TODO: Move to entity.copyFrom
+				var entity = entitiesDictionary[canvasId];
+				entity.code = originalEntity.code;
+				entity.entityClass = originalEntity.entityClass;
+			
+				// #TODO: Move to exp.copyFrom 
+				entity.functions = [];
+				for (var i=0; i< originalEntity.functions.length; i++) {
+					var exp = {}, originalFunction = originalEntity.functions[i];
+				
+					exp.name = originalFunction.name;
+					exp.vars = originalFunction.vars;
+					exp.language = originalFunction.language;
+					exp.definition = originalFunction.definition;
+					
+					if (i == functionIndex) {
+						exp.value = result[1];
+						exp.valueDSL = result[0];
+					}
+					else {
+						exp.value = originalFunction.value;
+						exp.valueDSL = originalFunction.valueDSL;
+					}
+					
+					entity.error = false;
+					entity.functions.push(exp);
+				}	
+				
+				replaceFunctionDefinitions(entity);
+				initializeAndDraw(canvasId);
+			},
+			error: function(data) {
+				console.log('Call failed');
+			}
+		});
+	}
+	
+	function addParentCallBack(name) {
+		$("#" + name)
+			.click(function(evt) {
+				for (var i=0; i< childCount; i++) {
+					var canvasId = "child" + i.toString();
+					if (entitiesDictionary[name] && (entitiesDictionary[name].functions.length > 0))
+						createFunctionCallMutateOn(name, canvasId, getFunctionIndex(name));
+				}
+			});
+	}
+	
+	function directedCrossoverFromGallery(name) {
+		for (var i=0; i< childCount; i++) {
+			var canvasId = "child" + i.toString();
+			createFunctionCrossoverFromLib( 
+				"parent" + Math.floor(Math.random() * parentCount).toString(),
+				canvasId);
+		}
+	}
+	
+	function getFunctionIndex(name) {
+		var functionsCount = entitiesDictionary[name].functions.length;
+		return Math.floor((Math.random() * functionsCount)).toString();
+	}
+	
+	// Scene graphics
+	function initializeAndDraw(canvasId, code) {
+		initWebGLSceneShaderMutation(canvasId, entitiesDictionary[canvasId]);
+		drawEntityImage();
+	}
+		
+	function initWebGLSceneShaderMutation(canvas, entity) {
+		var canvas = document.getElementById(canvas);
+		initGL(canvas);
+		initBuffersRGB();
+		initShadersShaderMutation(entity)	
+		gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		gl.disable(gl.DEPTH_TEST);
+	}
+	
+	function getProcessedShader(entity) {
+		var result = entity.code;
+		for (var i=0; i< entity.functions.length; i++)
+			result = result.replace(entity.functions[i].definition, 
+									entity.functions[i].value);
+		return result;
+	}
+
+	function replaceFunctionDefinitions(entity) {
+		var result = entity.code;
+		for (var i=0; i< entity.functions.length; i++) {
+			var definition = "#{" + 
+								entity.functions[i].name + "(" +
+								entity.functions[i].vars + ")" + " :: " +
+								entity.functions[i].language + " :: " +
+								entity.functions[i].value + " :: " +
+								entity.functions[i].valueDSL + 
+							"}#";
+			
+			entity.code = entity.code.replace(entity.functions[i].definition, definition);
+			entity.functions[i].definition = definition;
+		}
+	}
+	
+	function ensureTranslatedValue(entity, errorFunction) {
+		if (errorFunction == null)
+			errorFunction = function(data) { console.log('Source shader not found'); };
+		
+		for (var i=0; i< entity.functions.length; i++) 			
+			if ((entity.functions[i].value == "") && (entity.functions[i].valueDSL != ""))
+				$.ajax({
+						type: 'GET',
+						url: "/infixConvert",
+						data: { exp: entity.functions[i].valueDSL },
+						async: false,
+						dataType: "text",
+						success: function(data) { 
+							entity.functions[i].value = data;
+						},
+						error: errorFunction
+				});
+	}
+	
+	function initShadersShaderMutation(entity) {
+		var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(vertexShader, myVertexShaderSrc);
+		gl.compileShader(vertexShader);
+		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+		var fragmentShaderCode = getProcessedShader(entity);
+		gl.shaderSource(fragmentShader, fragmentShaderCode);
+		gl.compileShader(fragmentShader);
+		shaderProgram = gl.createProgram();
+		gl.attachShader(shaderProgram, vertexShader);
+		gl.attachShader(shaderProgram, fragmentShader);
+		gl.linkProgram(shaderProgram);
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+			// Show error on console
+			console.log("Could not initialise shaders for " + entity);
+			var errorDescription = gl.getShaderInfoLog(fragmentShader);
+			var lastError = gl.getProgramInfoLog(shaderProgram); 
+			console.log(lastError + " " + errorDescription);
+			entity.error = true;
+			
+			// Draw error image
+			gl.shaderSource(fragmentShader, fragmentErrorShaderSource);
+			gl.compileShader(fragmentShader);		
+			gl.linkProgram(shaderProgram);
+			if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+				console.log("Can't even show error.");
+				console.log(gl.getShaderInfoLog(fragmentShader));
+			}
+			
+			// Report error
+			$.ajax({
+				type: 'GET',
+				url: "/registerError",
+				data: { description: JSON.stringify(lastError + " " + errorDescription), code: fragmentShaderCode },
+				dataType: "text",
+				success: function(data) { console.log("Error reported");  },
+				error: function(data) { console.log('Error reported call failed'); }
+			});		
+		}
+		gl.useProgram(shaderProgram);
+		shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+		gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+		shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+		shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+	}
+	
+	function checkShaderMutation(entity) {
+		var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(vertexShader, myVertexShaderSrc);
+		gl.compileShader(vertexShader);
+		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+		gl.shaderSource(fragmentShader, getProcessedShader(entity));
+		gl.compileShader(fragmentShader);
+		shaderProgram = gl.createProgram();
+		gl.attachShader(shaderProgram, vertexShader);
+		gl.attachShader(shaderProgram, fragmentShader);
+		gl.linkProgram(shaderProgram);
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
+			return gl.getShaderInfoLog(fragmentShader);
+		return "";
+	}
+
+	function drawEntityImage () { 
+		globalVa = timerValue();
+		var location = gl.getUniformLocation(shaderProgram, "time");
+		gl.uniform1f(location, globalVa);	
+		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+		mat4.identity(mvMatrix);
+		mat4.translate(mvMatrix, [0.0, 0.0, -1.2]);
+		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		setMatrixUniforms();
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+	}
+	
+	function menuCallbackPrefix(name, index) {
+		if (index==0) {
+			var url_safe_entity = encodeURIComponent(JSON.stringify(entitiesDictionary[name]));
+			var url = "/view?entity=" + url_safe_entity;
+			window.open(url, "Object inspect");
+		}
+		else if (index==1) {
+			$.ajax({
+					type: 'GET',
+					url: "/like",
+					data: { entity: JSON.stringify(entitiesDictionary[name]), entityClass: objectClass },
+					dataType: "text",
+					success: function(data) { console.log("Like " + data + " accepted");  },
+					error: function(data) { console.log('Like call failed'); }
+				});			
+		}
+		else if (index==2) {
+			$.ajax({
+					type: 'GET',
+					url: "/dislike",
+					data: { entity: JSON.stringify(entitiesDictionary[name]), entityClass: objectClass },
+					dataType: "text",
+					success: function(data) { console.log("Dislike " + data + " accepted"); },
+					error: function(data) { console.log('Dislike call failed'); }
+				});	
+		}
+		else if (index==5) {
+			targetEntity = name;
+			document.getElementById("modal-container").innerHTML = 
+				"<div style=\"display: flex\">" + 
+					"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-toggle=\"modal\" data-target=\"#imageModal\" onclick=\"setShaderValue()\" >set</button>" + 
+					"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-target=\"#imageModal\" onclick=\"setShaderCheck()\" >check</button>" + 
+					"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-target=\"#imageModal\" onclick=\"setShaderBroke()\" >break</button>" + 
+					"<label style=\"margin-left: 50px; width: 200px\" class=\"checkbox-inline\"><input id=\"checkboxtoggle\" type=\"checkbox\"  onclick=\"setToggleBrokenOnOff()\" >Show broken</label>" + 
+					" " + 
+					"<a id=\"error-text\" class=\"form-control\" style=\"margin-left: 20px; margin-top: 3px; width: 280px\" rows=\"1\"></a>" +
+				"</div>" +
+				"<textarea id=\"modal-text\" class=\"form-control\" style=\"width: 480px\" rows=\"20\"></textarea>";
+			document.getElementById("modal-text").value = entitiesDictionary[name].code;
+			editorGlobal = $("#modal-text")[0];
+		}
+	}
+
+	function setShaderPopup() {
+		targetEntity = "all";
+		document.getElementById("modal-container").innerHTML = 
+			"<div style=\"display: flex\">" + 
+				"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-toggle=\"modal\" data-target=\"#imageModal\" onclick=\"setShaderValue()\" >set</button>" + 
+				"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-target=\"#imageModal\" onclick=\"setShaderCheck()\" >check</button>" + 
+				"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-target=\"#imageModal\" onclick=\"setShaderBroke()\" >break</button>" + 
+				"<label style=\"margin-left: 50px; width: 200px\" class=\"checkbox-inline\"><input id=\"checkboxtoggle\" type=\"checkbox\"  onclick=\"setToggleBrokenOnOff()\" />Show broken</label>" + 				
+				" " + 
+				"<a id=\"error-text\" class=\"form-control\" style=\"margin-left: 20px; margin-top: 3px; width: 280px\" rows=\"1\"></a>" +
+			"</div>" +
+			"<textarea id=\"modal-text\" class=\"form-control\" style=\"width: 480px\" rows=\"20\"></textarea>";
+		document.getElementById("modal-text").value = objectCode;
+		editorGlobal = $("#modal-text")[0];
+	}	
+
+	function setToggleBrokenOnOff () {
+		var value = document.getElementById("checkboxtoggle").value;
+		var editor = $("#modal-text")[0];
+		
+		if (value == "on") 
+			editor.value = objectCodeBrokered;
+		else
+			editor.value = objectCode;
+	}
+	
+	function setShaderValue() {
+		if (targetEntity == "all") 
+			setShaderValueAllParents();
+		else
+			setShaderValueOf(targetEntity);
+	}
+		
+	function setShaderValueAllParents() {	
+		objectCode = document.getElementById("modal-text").value;	
+		
+		for (var i=0; i< parentCount; i++) {
+			var canvasId = "parent" + i.toString();
+			
+			entitiesDictionary[canvasId] = {
+				code: objectCode,
+				entityClass: objectClass,
+				functions: parseFunctions(objectCode)
+			};
+			
+			ensureTranslatedValue(entitiesDictionary[canvasId]);
+			initializeAndDraw(canvasId);
+		}
+	}
+	
+	function setShaderValueOf(canvasId) {	
+		objectCode = document.getElementById("modal-text").value;
+		entitiesDictionary[canvasId] = {
+			code: objectCode,
+			entityClass: objectClass,
+			functions: parseFunctions(objectCode) };
+		ensureTranslatedValue(entitiesDictionary[canvasId]);
+		initializeAndDraw(canvasId);
+	}
+	
+	function setShaderCheck() {
+		var code = document.getElementById("modal-text").value;	
+		var canvasId = "parent0";
+		var canvas = document.getElementById(canvasId);
+		var errors = [];
+		var entity = {
+			code: code,
+			entityClass: objectClass,
+			functions: parseFunctions(code)
+		};
+		
+		ensureTranslatedValue(entity, function (data) { errors.push(data); });
+		
+		if (errors.length != 0) {
+			document.getElementById("error-text").innerHTML = "Error translating injections.";
+			return;
+		}
+		
+		var result = checkShaderMutation(entity);
+		if (result == "")
+			document.getElementById("error-text").innerHTML = "ok";
+		else
+			document.getElementById("error-text").innerHTML = result;
+	}
+	
+	function getBrokedEntity(entity, callback) {
+		var maxCount = document.getElementById("input-break-factor").value;
+		
+		$.ajax({
+			type: 'GET',
+			url: "broke",
+			data: { code: entity.code, count: maxCount },
+			async: false,
+			dataType: "text",
+			success: callback,
+			error: function(data) { console.log('Source shader not found'); }
+		});
+	}
+	
+	function setShaderBroke() {
+		objectCode = document.getElementById("modal-text").value;
+		var entity = { code: objectCode };
+		//replaceFunctionDefinitions(entity);
+		
+		getBrokedEntity(entity,
+			function (data) {
+				objectCodeBrokered = data;
+				
+				var entity = {
+					code: data,
+					entityClass: objectClass,
+					functions: parseFunctions(data),
+					language: "glsl-dsl"
+				};
+		
+				// Assign to parent 0
+				var canvasId = "parent0";
+				entitiesDictionary[canvasId] = entity;
+				ensureTranslatedValue(entitiesDictionary[canvasId]);
+				initializeAndDraw(canvasId);	
+				
+				// #TODO: Create mutations for the rest of the parents
+				for (var i=1; i< parentCount; i++) {
+					createFunctionCallMutateOn( 
+						"parent0",
+						"parent" + i.toString(),
+						getFunctionIndex("parent0"));	
+				}
+			});
+	}
+
+	for (var i=0; i< parentCount; i++) 
+		addParentCallBack("parent" + i);
+	initializeContextMenuOn("child", "context_menu", menuSetCallback);
+	initializeContextMenuOn("parent", "context_menu", menuSetCallback);
+</script>
+
+<div id="context_menu" style="border:1px solid black;background-color:#EEEEEE;visibility:hidden;position:absolute;line-height:25px; padding-left: 0px;">
+	<div><input type="button" value="Open" onclick="menuCallbackPrefix(globalSelectedIndex, 0)" style="width: 100px"/></div>
+	<div><input type="button" value="Like" onclick="menuCallbackPrefix(globalSelectedIndex, 1)" style="width: 100px"/></div>
+	<div><input type="button" value="Dislike" onclick="menuCallbackPrefix(globalSelectedIndex, 2)" style="width: 100px"/></div>
+	<div><input type="button" value="Animate" onclick="menuCallbackPrefix(globalSelectedIndex, 4)" style="width: 100px"/ disabled></div>
+	<div><input type="button" value="Edit" data-toggle="modal" data-target="#imageModal" onclick="menuCallbackPrefix(globalSelectedIndex, 5)" style="width: 100px"/></div>
+</div>
+{% endblock %}
+
+{% block footerscript %}
+{% parent %}
+{% endblock %}

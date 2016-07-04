@@ -1,0 +1,38 @@
+Checking: 0 root
+Checking: 1 precision
+Checking: 2 declarator
+Checking: 3 type
+Checking: 4 declarator_item
+Checking: 5 identifier
+Checking: 6 declarator_item
+Checking: 7 identifier
+Checking: 8 function_declaration
+Checking: 9 type
+Checking: 10 scope
+Checking: 11 declarator
+Checking: 12 type
+Checking: 13 declarator_item
+Checking: 14 identifier
+Checking: 15 function_call
+CONNECT: (make-instance 'tcp-message :name (quote message-web-interface-glsl-parse-result) :content (list (quote GLSL-GRAMMAR-TEST) (quote ((vec3 0.000 0.000 0.000))) (quote ((xx :var1) (yy :var1) (v :var3) ))))
+TYPE: EXPTHREE
+Checking: 16 float
+Checking: 17 float
+Checking: 18 float
+Checking: 19 declarator
+Checking: 20 type
+Checking: 21 declarator_item
+Checking: 22 identifier
+Checking: 23 postfix
+Checking: 24 field_selector
+Checking: 25 identifier
+
+VAR: main.v.r.VEC1
+
+precision mediump float;
+varying float xx, yy;
+void main() {
+        vec3 v = vec3(1.0);
+        float x = v.r;
+}
+

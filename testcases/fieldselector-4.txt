@@ -1,0 +1,64 @@
+varying float xx, yy;
+
+float hash(float a, float b) {
+	return a * b;
+}
+
+void main(void) {
+        float r = 3.0 * 2.0, x;
+        x = (2.0 * (r=3.1) * 1.5);
+        r = min(hash(1.0, 2.0), 3.0);
+}
+
+==================================================================================================
+
+   declarator float
+      declarator_item xx
+         identifier xx
+      declarator_item yy
+         identifier yy
+   function_declaration (float) hash
+         return
+            binary *
+               identifier a
+               identifier b
+   function_declaration (void) main
+         declarator float
+            declarator_item r
+               identifier r
+               binary *
+                  float 3
+                  float 2
+            declarator_item x
+               identifier x
+         expression
+            binary =
+               identifier x
+               binary *
+                  binary *
+                     float 2
+                     binary =
+                        identifier r
+                        float 3.1
+                  float 1.5
+         expression
+            binary =
+               identifier r
+               function_call min
+                  function_call hash
+                     float 1
+                     float 2
+                  float 3
+
+{ functions:
+   { hash: { returnType: 'float', parameters: [Object] },
+     main: { returnType: 'void', parameters: {} } },
+  descriptors: [],
+  lastType: null,
+  typeTable: {},
+  currentFunctionName: 'main',
+  lastState: null,
+  lastSelector: null,
+  aliasesIndex: 0,
+  aliases: {} }
+  

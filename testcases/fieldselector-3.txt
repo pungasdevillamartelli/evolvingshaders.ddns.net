@@ -1,0 +1,122 @@
+EJEMPLO
+-------
+
+varying float xx, yy;
+float rr = 2.0 * 4.2;
+
+float hash(float a, float b) {
+	return a * b;
+}
+
+void main(void) {
+	vec2 b;
+	floor(b.yx).xy;
+	sin(b) * 2.0;
+	float x = min(b.y, b.x);
+	float r = (b.yy * 2.0).x;
+	r = 12.35 * x * x;
+	return x * length(x);
+}
+
+==================================================================================================
+
+PARTS
+-----
+   declarator float
+      declarator_item xx
+         identifier xx
+      declarator_item yy
+         identifier yy
+   declarator float
+      declarator_item rr
+         identifier rr
+         binary *
+            float 2
+            float 4.2
+   function_declaration (void) main
+         declarator vec2
+            declarator_item b
+               identifier b
+         expression
+            postfix
+               field_selector xy
+               function_call floor
+                  postfix
+                     field_selector yx
+                     identifier b
+         expression
+            binary *
+               function_call sin
+                  identifier b
+               float 2
+         declarator float
+            declarator_item x
+               identifier x
+               function_call min
+                  postfix
+                     field_selector y
+                     identifier b
+                  postfix
+                     field_selector x
+                     identifier b
+         declarator float
+            declarator_item r
+               identifier r
+               postfix
+                  field_selector x
+                  binary *
+                     postfix
+                        field_selector yy
+                        identifier b
+                     float 2
+         return
+            binary *
+               identifier x
+               function_call length
+                  identifier x
+         expression
+            binary =
+               identifier r
+               binary *
+                  binary *
+                     float 12.35
+                     identifier x
+                  identifier x
+
+{ functions: { main: { returnType: [Object], parameters: {} } },
+  descriptors: [],
+  lastType: null,
+  typeTable: {},
+  currentFunctionName: 'main',
+  lastState: null,
+  lastSelector: null,
+  aliasesIndex: 0,
+  aliases: {} }
+
+
+
+TEMAS:
+-----
+
+- Keep track of function names for variable declaration
+- Ver como hacer los reemplazos en los nodos necesarios
+- Ver como meterse adentro de los argumentos cuando hay funciones conocidas
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,17 @@
+precision highp float;
+varying float xx, yy;
+uniform float time;
+
+vec2 hash(vec2 p) {
+	p = vec2(dot(p, vec2(107.1,301.7)), dot(p, vec2(151.5,353.3)));
+	return -1.0 + 2.0;
+}
+
+void mainImage(out vec4 fragColor, in vec2 fragCoord){
+	float x = 1.0;
+	fragColor = vec4(x,x,x,x);
+}
+
+void main(void) {
+	mainImage(gl_FragColor, vec2(xx, yy));
+}

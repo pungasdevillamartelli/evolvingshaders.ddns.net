@@ -1,0 +1,35 @@
+
+precision mediump float;
+varying float xx, yy;
+void main() {
+	vec3 v = vec3(0.0, 0.0, 0.0);
+	float x = v.r * v.g;
+}
+
+===>
+
+precision mediump float;
+varying float xx, yy;
+void main() {
+	vec3 v = vec3(0.0, 0.0, 0.0);
+	float x = xtract3(v, 0) * xtract(v, 1);
+}
+
+
+La idea es que reconozco field_selector o postfix y:
+	- tomo subarbol (v)
+	- tomo selector (r)
+	- DSL: meto xtract v, indice(r)
+	- EXP: idem
+	
+Ademas:
+	- Gramatica gpexplorer: agregar xtractN...
+	- El valor que aceptara podria ser modeado.
+	
+
+Dentro del codigo de cada shader se agregara una funcion xtract2, .... 4 para poder extraer los valores.
+El codigo se transforma y ya no usara mas los postfix, solo usará extract; es decir se trabajara con una transformacion del codigo original.
+
+
+
+

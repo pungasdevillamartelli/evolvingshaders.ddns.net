@@ -1,0 +1,91 @@
+// First index is input type, second is return type
+
+float fieldSelector21(vec2 value, int selector) {
+	if (selector == 0) 
+		return value.x;
+	else
+		return value.y;
+}
+
+float fieldSelector31(vec3 value, int selector) {
+	if (selector == 0) 
+		return value.x;
+	else if (selector == 1)
+		return value.y;
+	else
+		return value.z;
+}
+
+float fieldSelector41(vec4 value, int selector) {
+	if (selector == 0) 
+		return value.r;
+	else if (selector == 1)
+		return value.g;
+	else if (selector == 2)
+		return value.b;
+	else
+		return value.a;
+}
+
+int fieldSelectorValue(int value, int field) {
+	// #TODO
+	return 0;
+}
+
+vec2 fieldSelector22(vec2 value, int selector) {
+	vec2 result;
+	
+	if (fieldSelectorValue(0, 0) == 0) 
+		result.x = value.r;
+	else if (fieldSelectorValue(1, 0) == 1) 
+		result.x = value.g;
+	else if (fieldSelectorValue(2, 0) == 2) 
+		result.x = value.b;
+	else if (fieldSelectorValue(3, 0) == 3) 
+		result.x = value.a;
+
+	if (fieldSelectorValue(0, 1) == 0) 
+		result.y = value.r;
+	else if (fieldSelectorValue(1, 1) == 1) 
+		result.y = value.g;
+	else if (fieldSelectorValue(2, 1) == 1) 
+		result.y = value.b;
+	else if (fieldSelectorValue(3, 1) == 1) 
+		result.y = value.a;
+
+	return result;
+}
+
+vec2 fieldSelector23(vec3 value, int selector) {
+
+}
+
+vec2 fieldSelector24(vec4 value, int selector) {
+
+}
+
+vec3 fieldSelector32(vec2 value, int selector) {
+
+}
+
+vec3 fieldSelector33(vec3 value, int selector) {
+	
+}
+
+vec3 fieldSelector34(vec4 value, int selector) {
+
+}
+
+vec4 fieldSelector42(vec4 value, int selector) {
+
+}
+
+vec4 fieldSelector43(vec4 value, int selector) {
+
+}
+
+vec4 fieldSelector44(vec4 value, int selector) {
+
+}
+
+

@@ -1,0 +1,90 @@
+{% extends 'main-layout.html' %}
+
+<html lang="en">
+	<head>
+		<meta charset="utf-8">
+		<meta http-equiv="X-UA-Compatible" content="IE=edge">
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="">
+		<meta name="author" content="">
+		<meta name="keywords" content="">
+		{% block head %}
+		{% parent %}
+		{% endblock %}
+	</head>
+
+	<body>
+		<div class="container">
+			{% block content %}
+			{% parent %}
+			
+			<body onload="startup()">
+			<div class="container" style="padding-top: 60px">
+			<div>
+				<div id="main-div" style="max-width: 613px;">
+					<h2>Shader entries</h2>
+					<br/>
+					<div style="display: flex">
+						<div>
+						<a href="shader-entry.html"><p>Add</p></a>
+						{% for entry in entries %}
+						  {% if loop.first %}<ul>{% endif %}
+							<li id="entry-{{ entry.id }}">{{ entry.id }} {{ entry.name }} 
+								<a href="viewEntity?id={{ entry.id }}">View</a>
+								<a onclick="editEntry('{{ entry.id }}')">Edit</a>
+								<a onclick="deleteEntry('{{ entry.id }}')">Delete</a>
+							</li>
+						  {% if loop.last %}</ul>{% endif %}
+						{% endfor %}							
+						</div>
+					</div>
+				</div>
+			</div>
+			</body>
+			{% endblock %}
+		</div>
+	</body>
+	
+	{% block mainscript %}
+		<script>
+		
+		function deleteEntry (id) {
+			var success = function () {
+				document.getElementById("entry-" + id).remove();
+			};
+			
+			$.ajax({
+					type : 'GET',
+					url : "/deleteEntity",
+					data : { id: id },
+					dataType : "text",
+					success : success,
+					error : function(data) {
+						console.log('Call failed');
+			}});
+		}
+		
+		function startup () { }
+		
+		function saveEntry() {
+			var text = $("#text-entry")[0].value;
+			var arguments = { object: text };
+			var success = function () { };
+			
+			$.ajax({
+					type : 'GET',
+					url : "/addShaderEntity",
+					data : arguments,
+					dataType : "text",
+					success : success,
+					error : function(data) {
+						console.log('Call failed');
+			}});
+		}
+		</script>
+	{% endblock %}	
+	
+	{% block footerscript %}
+	{% parent %}
+	{% endblock %}	
+</html>
