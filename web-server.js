@@ -25,7 +25,7 @@ var defaultGLSLCodeOptions = {
 };
 
 // DB init
-var likeSchema, Like, dislikeSchema, Dislike, entitiesSchema, Entity, errorEntriesSchema, ErrorEntry;
+var likeSchema, Like, dislikeSchema, Dislike, entitiesSchema, Entity, errorEntriesSchema, ErrorEntry, adminLikeSchema, AdminLike;
 var mongoose = require('mongoose');
 var db = mongoose.createConnection('mongodb://localhost/pvmvisualization');
 
@@ -174,6 +174,18 @@ function getWithCriteria(res, req, arguments) {
 	}); 
 }
 
+function getAdminLikeWithCriteria(res, req, arguments) {
+	var a = AdminLike.find({ entityClass: arguments.entityClass }, function(err, likes) {
+		var value = Math.random() * likes.length;
+		var result = likes[Math.floor(value)];
+	
+		if (result != null)	
+			res.end(result.entity + " | " + result.entityClass + " | " + result.id);
+		else
+			res.end("none");
+	}); 
+}
+
 function createDefault(res, language) {
 	genericGPExplorerMessage(res, 
 	function(socket) {
@@ -307,7 +319,6 @@ function initializeDatabase() {
 		
 	Like = db.model('likes', likeSchema);
 	
-	
 	// Dislikes
 	dislikeSchema = mongoose.Schema({
 		user: { type: String, trim: true, index: true },
@@ -317,6 +328,16 @@ function initializeDatabase() {
 	});
 		
 	Dislike = db.model('dislikes', dislikeSchema);
+	
+	// Admin Likes
+	adminLikeSchema = mongoose.Schema({
+		user: { type: String, trim: true, index: true },
+		id: String,
+		entity: String,
+		entityClass: String
+	});
+
+	AdminLike = db.model('adminlikes', adminLikeSchema);
 	
 	// Error entries
 	errorEntriesSchema = mongoose.Schema({
@@ -346,6 +367,13 @@ function deleteEntity(res, arguments) {
 		function () {
 			res.end(arguments.id);
 		});
+}
+
+function adminLikeObject(res, args) {
+	var id = uuid.v1();
+	var value = new AdminLike({ id: id, entity: args.entity, entityClass: args.entityClass });
+	value.save(printBDError);
+	res.end(id);
 }
 
 function likeObject(res, args) {
@@ -1061,8 +1089,12 @@ function requestHandler(req, res) {
 		getEntityByIndex(res, arguments);
 	else if (pathname == "/getWithCriteria")
 		getWithCriteria(res, req, arguments);
+	else if (pathname == "/getAdminLikeWithCriteria")
+		getAdminLikeWithCriteria(res, req, arguments);
 	else if (pathname == "/like")
 		likeObject(res, arguments);
+	else if (pathname == "/adminLike")
+		adminLikeObject(res, arguments);
 	else if (pathname == "/broke")
 		brokeObject(res, arguments);
 	else if (pathname == "/dislike")

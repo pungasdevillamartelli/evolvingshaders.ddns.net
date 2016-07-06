@@ -1,0 +1,214 @@
+{% extends 'mutation-layout.html' %}
+
+{% block title %}Shaderclick gallery{% endblock %}
+
+{% block head %}
+{% parent %}
+	<style type="text/css">
+		canvas {
+		padding-left: 10px; padding-top: 10px }
+	</style>
+{% endblock %}
+
+{% block content %}
+{% parent %}
+	
+<div class="container" style="padding-top: 20px">
+	<div>
+		<div id="main-div" style="margin-top: 70px; max-width: 800px; ">
+			<div id="parents-div" class="view-container" style="margin-bottom: 5px">
+				<canvas id="gallery0" width="140" height="140" onclick="menuClickCallbackPrefix(0)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery1" width="140" height="140" onclick="menuClickCallbackPrefix(1)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery2" width="140" height="140" onclick="menuClickCallbackPrefix(2)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery3" width="140" height="140" onclick="menuClickCallbackPrefix(3)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery4" width="140" height="140" onclick="menuClickCallbackPrefix(4)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery5" width="140" height="140" onclick="menuClickCallbackPrefix(5)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery6" width="140" height="140" onclick="menuClickCallbackPrefix(6)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery7" width="140" height="140" onclick="menuClickCallbackPrefix(7)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery8" width="140" height="140" onclick="menuClickCallbackPrefix(8)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery9" width="140" height="140" onclick="menuClickCallbackPrefix(9)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery10" width="140" height="140" onclick="menuClickCallbackPrefix(10)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery11" width="140" height="140" onclick="menuClickCallbackPrefix(11)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
+				<canvas id="gallery12" width="140" height="140" onclick="menuClickCallbackPrefix(12)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery13" width="140" height="140" onclick="menuClickCallbackPrefix(13)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>				
+				<canvas id="gallery14" width="140" height="140" onclick="menuClickCallbackPrefix(14)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+				<canvas id="gallery15" width="140" height="140" onclick="menuClickCallbackPrefix(15)"
+					draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block mainscript %}
+<div id="context_menu" style="border:1px solid black;background-color:#EEEEEE;visibility:hidden;position:absolute; padding-left: 0px;">
+	<div><input type="button" value="Open" onclick="menuCallbackPrefix(globalSelectedIndex, 0)" style="width: 100px"/></div>
+	<div><input type="button" value="Like" onclick="menuCallbackPrefix(globalSelectedIndex, 1)" style="width: 100px"/></div>
+	<div><input type="button" value="Dislike" onclick="menuCallbackPrefix(globalSelectedIndex, 2)" style="width: 100px"/></div>
+	<div><input type="button" value="Animate" onclick="menuCallbackPrefix(globalSelectedIndex, 4)" style="width: 100px"/ disabled></div>
+</div>
+
+<script src="jquery-1.11.1.min.js"></script>
+<script src="bootstrap.min.js"></script>
+<script src="entity-shader-utils.js"></script>
+
+<script>		
+	var galleryDictionary = {};
+	var gallerySize = 15;
+	
+	var objectClass = "entity-shader",
+		objectErrorFile = "/example-scene-mutate-error.c",
+		fragmentShaderEffectSrc,
+		fragmentErrorShaderSource;
+		
+	function startupDraw () {			
+		for (var i=0; i< gallerySize; i++) {
+			var canvasId = "gallery" + i.toString();
+			createFunctionGeneric(canvasId, { entityClass: "entity-shader" }, "/getWithCriteria");
+		}
+		
+		// Read error shader
+		$.ajax({
+			type : 'GET',
+			url : objectErrorFile,
+			data : { },
+			async: false,
+			dataType : "text",
+			success : function(data) { fragmentErrorShaderSource = data; },
+			error : function(data) { console.log('Error shader not found'); }
+		});
+				
+		// Animation hover
+		function isHover(e) {
+			return (e.parentElement.querySelector(':hover') === e);
+		}
+		
+		function functionsDescriptionText(entity) {
+			var result = "";
+			for (var i in entity.functions) 
+				result += entity.functions[i].value + "\n\n";
+			return result;
+		}
+		
+		setInterval(function() {
+			for (var i=0; i< gallerySize; i++) {
+				var element = 'gallery' + i.toString();
+				if (isHover(document.getElementById(element))) {
+					if (galleryDictionary[element] != null) {
+						initializeAndDraw(element);
+					}
+					return;
+				}
+			}
+		}, 150);		
+	}
+
+	// Scene graphics
+	function initializeAndDraw(canvasId, code) {
+		galleryDictionary[canvasId].entityClass = objectClass;
+		initWebGLSceneShaderMutation(canvasId, galleryDictionary[canvasId]);
+		drawEntityImage();
+	}
+
+	function menuClickCallbackPrefix(index) {
+		return menuCallbackPrefix("gallery" + index, 0);
+	}
+	
+	function viewObject(ev) {
+		ev.preventDefault();
+	}
+
+	function allowDrop(ev) {
+		ev.preventDefault();
+	}
+
+	function drag(ev) {
+		ev.dataTransfer.setData("Text", JSON.stringify(galleryDictionary[ev.target.id]));
+	}
+	
+	function drop(ev) {
+		ev.preventDefault();
+		var result = JSON.parse(ev.dataTransfer.getData("Text"));
+		galleryDictionary[ev.target.id] = result;
+		if (result=="default") alert("Default error");
+		var canvasId = ev.target.id;
+		
+		if (result.entityClass == "entity-shader") {		
+			initializeAndDraw(canvasId);
+		}	
+	}
+	
+	function createFunctionGeneric(canvasId, arguments, message) {
+		$.ajax({
+			type : 'GET',
+			url : message,
+			data : arguments,
+			dataType : "text",
+			success : function(data) {
+				var result = data.split("|");
+				var object = JSON.parse(result[0]);
+				
+				galleryDictionary[canvasId] = object;
+				// Agrego id a la entidad
+				galleryDictionary[canvasId].id = result[2].trim();
+				
+				if (galleryDictionary[canvasId].entityClass == "entity-shader") {	
+					initializeAndDraw(canvasId);
+				}
+			},
+			error : function(data) {
+				console.log('Call failed');
+			}
+		});
+	}
+	
+	function menuCallbackPrefix(name, index) {			
+		if (index==0) {
+			var url_safe_entity = encodeURIComponent(JSON.stringify(galleryDictionary[name]));
+			var url = "/view?entity=" + url_safe_entity;
+			window.open(url, "Object inspect");
+		}
+		else if (index==1) {
+			$.ajax({
+				type : 'GET',
+				url : "/adminLike",
+				data : { entity: JSON.stringify(galleryDictionary[name]), entityClass: galleryDictionary.entityClass },
+				dataType : "text",
+				success : function(data) { console.log("Admin like " + data + " accepted");  },
+				error : function(data) { console.log('Admin like call failed'); }
+			});				
+		}
+		else if (index==2) {
+			$.ajax({
+				type : 'GET',
+				url : "/dislike",
+				data : { entity: JSON.stringify(galleryDictionary[name]), entityClass: galleryDictionary.entityClass },
+				dataType : "text",
+				success : function(data) { console.log("Dislike " + data + " accepted"); },
+				error : function(data) { console.log('Dislike call failed'); }
+			});			
+		}	
+	}
+</script>
+
+<script type="text/javascript">
+	initializeContextMenuOn("gallery", "context_menu", menuSetCallback);
+</script>	
+{% endblock %}
+
