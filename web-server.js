@@ -13,7 +13,7 @@ var http = require('http'),
 // Configuration
 http.globalAgent.maxSockets = 20;
 var requestTimeOut = 45000;
-var listeningPort = 9889;
+var listeningPort = 80;
 var variableReplacementPrefix = "vvv";
 var connectedGPExplorerImages;
 
