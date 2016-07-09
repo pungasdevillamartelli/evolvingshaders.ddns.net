@@ -22,9 +22,10 @@
 			<div class="container" style="padding-top: 60px">
 			<div>
 				<div id="main-div" style="max-width: 613px;">
-					<h2>Shader mutations paradise!</h2>
+					<h2>Shaderclick, GLSL language mutation paradise!</h2>
 					<br/>
 					<h4>GLSL mutation engine for changing our shaders just clicking.</h4>
+					<p>Click to open, right click for menu!</p>
 				</div>
 				<br/>
 				<br/>
@@ -41,7 +42,6 @@
 						draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>						
 				</div>				
 			</div>
-
 			{% endblock %}
 		</div>
 	</body>
@@ -70,7 +70,7 @@
 	function startupDraw () {			
 		for (var i=0; i< gallerySize; i++) {
 			var canvasId = "gallery" + i.toString();
-			createFunctionGeneric(canvasId, { entityClass: "entity-shader" }, "/getWithCriteria");
+			createFunctionGeneric(canvasId, { entityClass: objectClass }, "/getAdminLikeWithCriteria");
 		}
 		
 		// Read error shader
@@ -154,13 +154,12 @@
 				var result = data.split("|");
 				var object = JSON.parse(result[0]);
 				
-				galleryDictionary[canvasId] = object;
 				// Agrego id a la entidad
+				galleryDictionary[canvasId] = object;
 				galleryDictionary[canvasId].id = result[2].trim();
 				
-				if (galleryDictionary[canvasId].entityClass == "entity-shader") {	
+				if (galleryDictionary[canvasId].entityClass == "entity-shader")
 					initializeAndDraw(canvasId);
-				}
 			},
 			error : function(data) {
 				console.log('Call failed');
@@ -192,12 +191,16 @@
 				dataType : "text",
 				success : function(data) { console.log("Dislike " + data + " accepted"); },
 				error : function(data) { console.log('Dislike call failed'); }
-			});			
+			});	
 		}	
 	}
 </script>
-	
-	{% block footerscript %}
-	{% parent %}
-	{% endblock %}	
+		
+<script type="text/javascript">
+	initializeContextMenuOn("gallery", "context_menu", menuSetCallback);
+</script>
+
+{% block footerscript %}
+{% parent %}
+{% endblock %}	
 </html>

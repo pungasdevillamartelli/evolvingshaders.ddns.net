@@ -15,6 +15,7 @@ http.globalAgent.maxSockets = 20;
 var requestTimeOut = 45000;
 var listeningPort = 9889;
 var variableReplacementPrefix = "vvv";
+var connectedGPExplorerImages;
 
 var defaultGLSLCodeOptions = {
 	tab: '\t',       
@@ -115,9 +116,15 @@ function setFile(filePath, data, res) {
 	});
 }
 
+function createGPExplorerSocket() {
+	var value = 20000 + Math.ceil(Math.random() * 1000) % connectedGPExplorerImages;
+	console.log("VALUE GP: " + value)
+	return net.createConnection(value.toString(), "127.0.0.1");
+}
+
 // GPExplorer interface
 function genericGPExplorerMessage(res, connectFunction, dataFunction) {
-	var socket = net.createConnection("20000", "127.0.0.1");
+	var socket = createGPExplorerSocket();
 	
 	socket
 		.on('data', function(data) {
@@ -175,9 +182,9 @@ function getWithCriteria(res, req, arguments) {
 }
 
 function getAdminLikeWithCriteria(res, req, arguments) {
-	var a = AdminLike.find({ entityClass: arguments.entityClass }, function(err, likes) {
-		var value = Math.random() * likes.length;
-		var result = likes[Math.floor(value)];
+	var a = AdminLike.find( null/* { entityClass: arguments.entityClass } */, function(err, adminlikes) {
+		var value = Math.random() * adminlikes.length;
+		var result = adminlikes[Math.floor(value)];
 	
 		if (result != null)	
 			res.end(result.entity + " | " + result.entityClass + " | " + result.id);
@@ -349,6 +356,10 @@ function initializeDatabase() {
 	ErrorEntry = db.model('errorentries', errorEntriesSchema);
 }
 
+function initializeGPExplorerImages() {
+	connectedGPExplorerImages = 1;
+}
+
 var printBDError = function (err, result) {
       if (err) throw err;
       console.log(result);
@@ -387,7 +398,7 @@ function dislikeObject(res, args) {
 	var id = uuid.v1();
 	var value = new Dislike({ id: id, entity: args.entity, entityClass: args.entityClass });
 	value.save(printBDError);
-	res.end();
+	res.end(id);
 }
 
 function registerError (res, args) {
@@ -539,7 +550,7 @@ function isBuiltInFunction (name) {
 
 function getDescriptorDescriptor(descriptor) {
 	return "#{ " + descriptor.name + 
-			 "(" + descriptor.vars + ") :: "  
+			 "(" + descriptor.vars + ") :: " 
 				 + descriptor.type + " :: " + 
 				   descriptor.exp + " :: " + 
 				   descriptor.dsl + 
@@ -1137,7 +1148,8 @@ function handlerHook(req, res) {
 }
 
 initializeDatabase();
-  
+initializeGPExplorerImages();
+
 try {
 	http.createServer(handlerHook)
 		.listen(listeningPort);

@@ -1,0 +1,55 @@
+{% extends 'mutation-layout.html' %}
+
+{% block title %}Shaderclick gallery{% endblock %}
+
+{% block head %}
+{% parent %}
+{% endblock %}
+
+{% block content %}
+{% parent %}
+	
+<div class="container" style="padding-top: 20px">
+	<div>
+		<div id="main-div" style="margin-top: 70px; max-width: 800px; ">
+			<div id="comments-div" class="view-container" style="margin-bottom: 5px">
+				<h4>Status</h4>
+				<br/>
+				<p>Likes: </p>
+				<p>Dislikes: </p>
+			</div>
+		</div>
+	</div>
+</div>
+
+{% endblock %}
+
+{% block mainscript %}
+<script>		
+	function startupDraw () {			
+		// Read error shader
+		$.ajax({
+			type : 'GET',
+			url : objectErrorFile,
+			data : { },
+			async: false,
+			dataType : "text",
+			success : function(data) { fragmentErrorShaderSource = data; },
+			error : function(data) { console.log('Error shader not found'); }
+		});
+		
+		setInterval(function() {
+			for (var i=0; i< gallerySize; i++) {
+				var element = 'gallery' + i.toString();
+				if (isHover(document.getElementById(element))) {
+					if (galleryDictionary[element] != null) {
+						initializeAndDraw(element);
+					}
+					return;
+				}
+			}
+		}, 150);		
+	}
+</script>
+{% endblock %}
+

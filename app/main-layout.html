@@ -7,15 +7,15 @@
 		<meta name="description" content="Attack visualizer.">
 		<meta name="author" content="">
 		<meta name="keywords" content="pvm, playlist, mix">
-		<title>{% block title %}Attack visualizer{% endblock %}</title>
+		<title>{% block title %}Shaderclick{% endblock %}</title>
 
-	  {% block head %}
-		<script src="jquery-1.11.1.min.js"></script>
-		<link href="bootstrap.min.css" rel="stylesheet">
-		<link href="site.css" rel="stylesheet">
-		<script src="utils.js"></script>		
-		<script src="glMatrix-0.9.5.min.js"></script>		
-	  {% endblock %}
+		{% block head %}
+			<script src="jquery-1.11.1.min.js"></script>
+			<link href="bootstrap.min.css" rel="stylesheet">
+			<link href="site.css" rel="stylesheet">
+			<script src="utils.js"></script>
+			<script src="glMatrix-0.9.5.min.js"></script>
+		{% endblock %}
 	</head>
 
 	{% block body %}
@@ -32,14 +32,6 @@
 					<li><a style="text-shadow: none;" href="/help.html">Help</a></li>
 					<li><a style="text-shadow: none;" href="/editor-a.html">Editor</a></li>
 					<li><a style="text-shadow: none;" href="/gallery.html">Gallery</a></li>
-				<!--<li><a style="text-shadow: none;" href="/index.html">Home</a></li>					
-					<li class="dropdown">              
-					  <a style="text-shadow: none;" class="dropdown-toggle" href="/entries" data-toggle="dropdown">Objects <span class="caret"></span></a>
-					  <ul class="dropdown-menu" role="menu">
-						<li><a style="text-shadow: none;" href="/example-shaders-mutate.html">Shader editor</a></li>
-						<li><a style="text-shadow: none;" href="/shader-gallery.html">Shader gallery</a></li>
-					  </ul>
-					</li>-->
 				  </ul>
 				</div>
 			</div>
