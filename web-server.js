@@ -118,7 +118,6 @@ function setFile(filePath, data, res) {
 
 function createGPExplorerSocket() {
 	var value = 20000 + Math.ceil(Math.random() * 1000) % connectedGPExplorerImages;
-	console.log("VALUE GP: " + value)
 	return net.createConnection(value.toString(), "127.0.0.1");
 }
 
@@ -182,15 +181,24 @@ function getWithCriteria(res, req, arguments) {
 }
 
 function getAdminLikeWithCriteria(res, req, arguments) {
-	var a = AdminLike.find( null/* { entityClass: arguments.entityClass } */, function(err, adminlikes) {
+	var a = AdminLike.find( null /* { entityClass: arguments.entityClass } */, function(err, adminlikes) {
 		var value = Math.random() * adminlikes.length;
 		var result = adminlikes[Math.floor(value)];
-	
 		if (result != null)	
 			res.end(result.entity + " | " + result.entityClass + " | " + result.id);
 		else
 			res.end("none");
 	}); 
+}
+
+function adminDislikeObject(res, req, arguments) {
+	console.log("ID: " + arguments.id)
+	var a = AdminLike.findOne( { id: arguments.id }, function(err, objects) {
+		if (objects != null)
+			objects.remove(function (err) {if (err) throw err; });
+		console.log("Deleted " + arguments.id);
+	}); 
+	res.end("ok");
 }
 
 function createDefault(res, language) {
@@ -420,6 +428,15 @@ function view(res, arguments, h, w) {
 	var localFolder = __dirname + '/app';
 	var result = swig.renderFile(localFolder + "/view.html", { height: (h == null) ? 1024 : h, width: (w == null) ? 1024 : w });
 	var entity = arguments.entity;
+	result = result.toString().replace("#ENTITY#", replaceAllOn(entity, "\n", ""));
+	res.end(result);
+}
+
+function getEditor(name, res, arguments, h, w) {
+	var localFolder = __dirname + '/app';
+	var result = swig.renderFile(localFolder + name, { height: (h == null) ? 1024 : h, width: (w == null) ? 1024 : w });
+	var entity = arguments.entity;
+	if (arguments.entity == null) entity = "null";
 	result = result.toString().replace("#ENTITY#", replaceAllOn(entity, "\n", ""));
 	res.end(result);
 }
@@ -1087,7 +1104,9 @@ function requestHandler(req, res) {
 	else if (pathname == "/crossover")
 		crossoverFunctions(res, arguments.language, arguments.objectDataA, arguments.objectDataB, arguments.maxSize);
 	else if (pathname == "/view")
-		view(res, arguments, arguments.h, arguments.w);		
+		view(res, arguments);		
+	else if (pathname == "/viewShaderVariation")
+		viewShaderVariation(res, arguments);		
 	else if (pathname == "/infixConvert")
 		getInfixConverted(res, arguments.exp);
 	else if (pathname == "/glslConvert")
@@ -1100,12 +1119,14 @@ function requestHandler(req, res) {
 		getEntityByIndex(res, arguments);
 	else if (pathname == "/getWithCriteria")
 		getWithCriteria(res, req, arguments);
-	else if (pathname == "/getAdminLikeWithCriteria")
+	else if (pathname == "/getAdminLike")
 		getAdminLikeWithCriteria(res, req, arguments);
 	else if (pathname == "/like")
 		likeObject(res, arguments);
 	else if (pathname == "/adminLike")
 		adminLikeObject(res, arguments);
+	else if (pathname == "/adminDislike")
+		adminDislikeObject(res, req, arguments);	
 	else if (pathname == "/broke")
 		brokeObject(res, arguments);
 	else if (pathname == "/dislike")
@@ -1114,6 +1135,8 @@ function requestHandler(req, res) {
 		registerError(res, arguments);	
 	else if (pathname == "/deparseTest")
 		deparseTest(res, arguments);
+	else if ((pathname == "/editor-a.html") || (pathname == "/editor-b.html") || (pathname == "/editor-c.html"))
+		getEditor(pathname, res, arguments);
 	else {
 		console.log("URL : " + req.url);
 		var fileName = path.basename(req.url) || 'index.html',

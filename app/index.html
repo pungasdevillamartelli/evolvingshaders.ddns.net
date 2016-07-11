@@ -52,6 +52,7 @@
 	<div><input type="button" value="Like" onclick="menuCallbackPrefix(globalSelectedIndex, 1)" style="width: 100px"/></div>
 	<div><input type="button" value="Dislike" onclick="menuCallbackPrefix(globalSelectedIndex, 2)" style="width: 100px"/></div>
 	<div><input type="button" value="Animate" onclick="menuCallbackPrefix(globalSelectedIndex, 4)" style="width: 100px"/ disabled></div>
+	<div><input type="button" value="Edit" onclick="menuCallbackPrefix(globalSelectedIndex, 5)" style="width: 100px"/></div>
 </div>
 
 <script src="jquery-1.11.1.min.js"></script>
@@ -70,7 +71,7 @@
 	function startupDraw () {			
 		for (var i=0; i< gallerySize; i++) {
 			var canvasId = "gallery" + i.toString();
-			createFunctionGeneric(canvasId, { entityClass: objectClass }, "/getAdminLikeWithCriteria");
+			createFunctionGeneric(canvasId, { entityClass: objectClass }, "/getAdminLike");
 		}
 		
 		// Read error shader
@@ -193,6 +194,11 @@
 				error : function(data) { console.log('Dislike call failed'); }
 			});	
 		}	
+		else if (index==5) {
+			var url_safe_entity = encodeURIComponent(JSON.stringify(galleryDictionary[name]));
+			var url = "/editor-a.html?entity=" + url_safe_entity;
+			window.open(url, "Object inspect");
+		}
 	}
 </script>
 		

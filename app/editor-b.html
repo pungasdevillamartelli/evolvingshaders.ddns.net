@@ -15,38 +15,38 @@
 {% endblock %}
 
 {% block content %}
-{% parent %}
+{% parent %}		
 	<div class="container" style="padding-top: 60px; width: 950px">
 		<div id="main-div" style="border-left: 1px solid lightgray; display: flex">
 			<div style="width: 578px">
 				<div id="container-pdiv" class="view-container" style="margin-bottom: 5px; display">
 					<div>
-						<canvas id="parent0" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-						<canvas id="parent1" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-						<canvas id="parent2" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-						<canvas id="parent3" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<input type="submit" value="Operate" onclick="operate()" style="width: 35%; background-color: #5cb85c"/>			
+						<input type="button" value="Operate with gallery" onclick="directedCrossoverFromGallery()" style="width: 35%; background-color: #5cb85c;"/>
+						<input type="submit" value="Break" onclick="setShaderBroke()" style="width: 20%; background-color: #5cb85c"/>			
+					</div>
+
+					<div id="container-cdiv1" class="view-container" style="margin-top: 10px">
+						<canvas id="child0" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="child1" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="child2" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="child3" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="child4" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="child5" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<!--<div>-->
+						<canvas id="parent1" width="256" height="256" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="parent2" width="256" height="256" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<!--</div>-->
+					<!--</div>
+					<div id="container-cdiv2" class="view-container" style="margin-top: 10px">-->
+						<canvas id="child6" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="child7" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
+						<canvas id="child8" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="child9" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="child10" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+						<canvas id="child11" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
 					</div>
 				</div>
-				<div>
-					<input type="submit" value="Operate" onclick="operate()" style="width: 35%; background-color: #5cb85c"/>			
-					<input type="button" value="Operate with gallery" onclick="directedCrossoverFromGallery()" style="width: 35%; background-color: #5cb85c;"/>
-					<input type="submit" value="Break" onclick="setShaderBroke()" style="width: 20%; background-color: #5cb85c"/>			
-				</div>
-				<div id="container-cdiv" class="view-container" style="margin-top: 10px">
-					<canvas id="child0" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child1" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child2" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child3" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child4" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child5" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child6" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child7" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
-					<canvas id="child8" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child9" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>			
-					<canvas id="child10" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child11" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
-				</div>
-			</div>
 			<div id="comments-div" class="view-container" style="border: 1px solid lightgray;">
 				<div class="modal fade" id="imageModal" role="dialog" aria-hidden="true" >
 				  <div class="modal-dialog">
@@ -54,7 +54,6 @@
 					  <div id="modal-container" class="modal-body" style="width: 100%; display: block">
 						<input id="modal-text" rows="20">
 						<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setShaderValue()" >set</button>
-						<button type="button" class="btn btn-default" style="height: 30px" data-toggle="modal" data-target="#imageModal" onclick="setShaderValueAllParents()" >set all</button>						
 					  </div>
 					</div>
 				  </div>
@@ -62,13 +61,13 @@
 				<form>
 					<div style="width: 245px">
 						<div style="margin-top: 20px; padding-left: 15px">
-							<div style="display: block">
+							<div style="display: block">	
 								<div>
 									<div class="label">Objective</div>
 									<div style="display: flex; height: 30px; padding-bottom: 7px">
-										<!--<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setShaderPopup()" style="width: 55px">Code</button>-->
-										<!--<div style="width: 5px"></div>-->
-										<select id="fitness-select" style="width: 220px" disabled>
+										<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setShaderPopup()" style="width: 35px">...</button>
+										<div style="width: 5px"></div>
+										<select id="fitness-select" style="width: 180px" disabled>
 											<option value="Scene sample">Scene sample</option>
 										</select>
 									</div>
@@ -78,7 +77,7 @@
 									<div style="display: flex; height: 30px; padding-bottom: 7px">
 										<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setEvaluatorPopup()" style="width: 35px">...</button>
 										<div style="width: 5px"></div>
-										<select id="fitness-select" style="width: 180px" disabled>
+										<select id="fitness-select" style="width: 180px">
 											<option value="None">None</option>
 											<option value="Smooth">Smooth</option>
 											<option value="Smooth">Blue</option>
@@ -88,21 +87,21 @@
 								<div style="display: flex">
 									<div style="display: block">
 										<div class="label">Max size</div>	
-										<input id="input-max-size" style="width: 52px" type="text" value="25"/>
+										<input id="input-max-size" style="width: 55px" type="text" value="12"/>
 									</div>
 									<div style="display: block">
 										<div class="label">Brk factor</div>	
-										<input id="input-break-factor" style="width: 52px" type="text" value="20"/>
-									</div>
+										<input id="input-break-factor" style="width: 55px" type="text" value="20"/>
+									</div>									
 									<div style="display: block">
 										<div class="label">Mutations</div>	
-										<input id="input-mutations" style="width: 52px" type="text" value="1" disabled/>
-									</div>
+										<input id="input-mutations" style="width: 55px" type="text" value="1" disabled/>
+									</div>									
 								</div>
 								<div style="display: flex">
 									<div>
 										<div class="label">Mode</div>	
-										<select style="width: 100px" id="fitness-select" value="operation" disabled>
+										<select style="width: 100px" id="fitness-select" value="operation">
 											<option value="operation">Operation</option>
 											<option value="inspect">Inspect</option>
 											<option value="search">Search</option>
@@ -110,15 +109,15 @@
 									</div>
 									<div>
 										<div class="label">Function</div>	
-										<select style="width: 100px" id="function-select" value="all" disabled>
+										<select style="width: 100px" id="function-select" value="all">
 											<option value="all">All</option>
 										</select>
-									</div>
+									</div>									
 								</div>
-								<!--<div>
+								<div>
 									<div class="label">Max time</div>	
 									<input type="text" value="1" disabled/>
-								</div> -->
+								</div>	
 								<div>
 									<button type="button" class="btn btn-default" onclick="resetParents()" style="width: 51.0%">Reset parents</button>
 									<button type="button" class="btn btn-default" onclick="resetTime()" style="width: 42.0%">Reset time</button>
@@ -126,13 +125,9 @@
 								<div>
 									<br/>
 									<div class="label" style="width: 70px">Expression</div>	
-									<textarea id="hoverExpression" style="height: 100px"></textarea>
-								</div>	
-								<div>
-									<input type="submit" value="Inject" onclick="inject()" style="width: 35%; background-color: #5cb85c"/ disabled>
-									<textarea id="injectExpression" style="height: 40px"></textarea>
-								</div>
-							</div>
+									<textarea id="hoverExpression" style="height: 160px"></textarea>
+								</div>									
+							</div>			
 						</div>
 					</div>
 				</form>
@@ -147,15 +142,18 @@
 <script src="mutation-strategy.js"></script>
 <!--<script src="enitity-shader-utils.js"></script>-->
 
-<script>
+<script>		
 	var entitiesDictionary = {};
-	var childCount = 12, parentCount = 4;
+	var childCount = 12, parentCount = 2;
 	// #TODO: add a generic shader class (switchs en draw, init, etc.)
 	var objectClass = "entity-shader",
 		objectFile = "/example-scene-mutate-a.c", 
 		objectErrorFile = "/example-scene-mutate-error.c",
-		fragmentErrorShaderSource,
-		defaultEntity = #ENTITY#;
+		objectCode = "",
+		objectCodeBrokered = "",
+		fragmentShaderEffectSrc,
+		fragmentErrorShaderSource;
+	
 
 	function replaceAll(find, replace, str) {
 		return str.replace(new RegExp(find, 'g'), replace);
@@ -254,7 +252,10 @@
 	}
 	
 	function resetParents() {
-		createFunctionCallCreateDefaults();
+		for (var i=0; i< 1; i++) {
+			var canvasId = "parent" + i.toString();
+			createFunctionCallCreateDefault(canvasId);
+		}
 	}
 	
 	function resetTime() {
@@ -281,7 +282,12 @@
 			dataType: "text",
 			success: function(data) { 
 				$("#modal-text")[0].value = data;
-				createFunctionCallCreateDefaults();
+				objectCode = data;
+				fragmentShaderEffectSrc = data; 
+				for (var i=0; i< 1; i++) {
+					var canvasId = "parent" + i.toString();
+					createFunctionCallCreateDefault(canvasId);
+				}
 			},
 			error: function(data) { console.log('Source shader not found'); }
 		});
@@ -354,43 +360,24 @@
 		}, 150);
 	}
 	
-	
-	function fixFactorizedVars (entity) {
-		if (getStartDelimiters(entity.code).length > 0) {
-			entity.factorizedCode = entity.code;
-			
-		}
-		entity.code = getProcessedShader(entity);
-	}
-	
-	function createFunctionCallCreateDefaults() {
-		if (defaultEntity == null) {
-			createFunctionGenericGetDefaults({ entityClass: objectClass }, "/getAdminLike");
-		}
-		else {
-			for (var i=0; i< parentCount; i++) {
-				var canvasId = "parent" + i.toString();
-				entitiesDictionary[canvasId] = deepCopy(defaultEntity);
-				fixFactorizedVars(entitiesDictionary[canvasId]);
-				initializeAndDraw(canvasId);			
-			}
-		}
+	function createFunctionCallCreateDefault(canvasId) {
+		//createFunctionGeneric(name, { entityClass: objectClass }, "/getWithCriteria");
 		
-	/*	// Initial default scene
+		// Initial default scene
 		entitiesDictionary[canvasId] = {
 			code: objectCode,
 			entityClass: objectClass,
 			functions: parseFunctions(objectCode)
 		};
 		ensureTranslatedValue(entitiesDictionary[canvasId]);
-		initializeAndDraw(canvasId); */
+		initializeAndDraw(canvasId);
 	}
 	
 	function createFunctionCallMutateOn(name, canvasId, functionIndex) {
 		var maxSize = document.getElementById("input-max-size").value;
 		var entity = entitiesDictionary[name];
 		
-		createFunctionGenericOperate(
+		createFunctionGeneric(
 			canvasId,	
 			{ language: "glsl-dsl", 
 			  maxSize: maxSize, 
@@ -407,7 +394,7 @@
 		var maxSize = document.getElementById("input-max-size").value;	
 		var entity = entitiesDictionary[nameA];
 		
-		createFunctionGenericOperate(
+		createFunctionGeneric(
 			canvasId,
 			{ language: "glsl-dsl", 
 			  maxSize: maxSize,	
@@ -423,7 +410,7 @@
 		var maxSize = document.getElementById("input-max-size").value;
 		var entity = entitiesDictionary[name];
 		
-		createFunctionGenericOperate(
+		createFunctionGeneric(
 			name,	
 			{ language: "glsl-dsl", 
 			  maxSize: maxSize 
@@ -444,7 +431,7 @@
 		
 		if (xmlHttp.status === 200) { 
 			var newElementData = xmlHttp.responseText.split("|");
-			createFunctionGenericOperate(
+			createFunctionGeneric(
 				canvasId,
 				{ language: "glsl-dsl", 
 				  maxSize: maxSize, 
@@ -518,30 +505,7 @@
 		return jQuery.extend(true, {}, oldObject);
 	}
 	
-	function createFunctionGenericGetDefaults(arguments, message) {
-		$.ajax({
-			type : 'GET',
-			url : message,
-			data : arguments,
-			dataType : "text",
-			success : function(data) {
-				var result = data.split("|");
-				
-				for (var i=0; i< parentCount; i++) {
-					var canvasId = "parent" + i.toString();
-					var object = JSON.parse(result[0]);
-					entitiesDictionary[canvasId] = object;
-					fixFactorizedVars(object);
-					initializeAndDraw(canvasId);
-				}
-			},
-			error : function(data) {
-				console.log('Call failed');
-			}
-		});
-	}
-	
-	function createFunctionGenericOperate(canvasId, arguments, message, originalEntity, functionIndex) {
+	function createFunctionGeneric(canvasId, arguments, message, originalEntity, functionIndex) {
 		//var target = new MutationTarget(originalEntity, functionIndex);
 		
 		$.ajax({
@@ -552,16 +516,17 @@
 			success: function(data) {
 				var result = data.split("|");
 				entitiesDictionary[canvasId] = { };
+				
 				// #TODO: Move to entity.copyFrom
 				var entity = entitiesDictionary[canvasId];
 				entity.code = originalEntity.code;
-				entity.factorizedCode = originalEntity.factorizedCode;
 				entity.entityClass = originalEntity.entityClass;
 			
 				// #TODO: Move to exp.copyFrom 
 				entity.functions = [];
 				for (var i=0; i< originalEntity.functions.length; i++) {
 					var exp = {}, originalFunction = originalEntity.functions[i];
+				
 					exp.name = originalFunction.name;
 					exp.vars = originalFunction.vars;
 					exp.language = originalFunction.language;
@@ -581,7 +546,6 @@
 				}	
 				
 				replaceFunctionDefinitions(entity);
-				fixFactorizedVars(entity);
 				initializeAndDraw(canvasId);
 			},
 			error: function(data) {
@@ -631,7 +595,7 @@
 	}
 	
 	function getProcessedShader(entity) {
-		var result = entity.factorizedCode;
+		var result = entity.code;
 		for (var i=0; i< entity.functions.length; i++)
 			result = result.replace(entity.functions[i].definition, 
 									entity.functions[i].value);
@@ -639,8 +603,7 @@
 	}
 
 	function replaceFunctionDefinitions(entity) {
-		var result = entity.factorizedCode;
-		
+		var result = entity.code;
 		for (var i=0; i< entity.functions.length; i++) {
 			var definition = "#{" + 
 								entity.functions[i].name + "(" +
@@ -649,18 +612,17 @@
 								entity.functions[i].value + " :: " +
 								entity.functions[i].valueDSL + 
 							"}#";
-			result = result.replace(entity.functions[i].definition, definition);
+			
+			entity.code = entity.code.replace(entity.functions[i].definition, definition);
 			entity.functions[i].definition = definition;
 		}
-		
-		entity.factorizedCode = result;
 	}
 	
 	function ensureTranslatedValue(entity, errorFunction) {
 		if (errorFunction == null)
 			errorFunction = function(data) { console.log('Source shader not found'); };
 		
-		for (var i=0; i< entity.functions.length; i++) 
+		for (var i=0; i< entity.functions.length; i++) 			
 			if ((entity.functions[i].value == "") && (entity.functions[i].valueDSL != ""))
 				$.ajax({
 						type: 'GET',
@@ -680,7 +642,7 @@
 		gl.shaderSource(vertexShader, myVertexShaderSrc);
 		gl.compileShader(vertexShader);
 		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-		var fragmentShaderCode = entity.code;
+		var fragmentShaderCode = getProcessedShader(entity);
 		gl.shaderSource(fragmentShader, fragmentShaderCode);
 		gl.compileShader(fragmentShader);
 		shaderProgram = gl.createProgram();
@@ -697,7 +659,7 @@
 			
 			// Draw error image
 			gl.shaderSource(fragmentShader, fragmentErrorShaderSource);
-			gl.compileShader(fragmentShader);
+			gl.compileShader(fragmentShader);		
 			gl.linkProgram(shaderProgram);
 			if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
 				console.log("Can't even show error.");
@@ -726,8 +688,7 @@
 		gl.shaderSource(vertexShader, myVertexShaderSrc);
 		gl.compileShader(vertexShader);
 		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-		fixFactorizedVars(enitity);
-		gl.shaderSource(fragmentShader, entity.code);
+		gl.shaderSource(fragmentShader, getProcessedShader(entity));
 		gl.compileShader(fragmentShader);
 		shaderProgram = gl.createProgram();
 		gl.attachShader(shaderProgram, vertexShader);
@@ -783,7 +744,6 @@
 			document.getElementById("modal-container").innerHTML = 
 				"<div style=\"display: flex\">" + 
 					"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-toggle=\"modal\" data-target=\"#imageModal\" onclick=\"setShaderValue()\" >set</button>" + 
-					"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px; width: 100px\" data-toggle=\"modal\" data-target=\"#imageModal\" onclick=\"setShaderValueAllParents()\" >set all</button>" + 
 					"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-target=\"#imageModal\" onclick=\"setShaderCheck()\" >check</button>" + 
 					"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-target=\"#imageModal\" onclick=\"setShaderBroke()\" >break</button>" + 
 					"<label style=\"margin-left: 50px; width: 200px\" class=\"checkbox-inline\"><input id=\"checkboxtoggle\" type=\"checkbox\"  onclick=\"setToggleBrokenOnOff()\" >Show broken</label>" + 
@@ -801,7 +761,6 @@
 		document.getElementById("modal-container").innerHTML = 
 			"<div style=\"display: flex\">" + 
 				"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-toggle=\"modal\" data-target=\"#imageModal\" onclick=\"setShaderValue()\" >set</button>" + 
-				"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-toggle=\"modal\" data-target=\"#imageModal\" onclick=\"setShaderValueAllParents()\" >set all</button>" + 				
 				"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-target=\"#imageModal\" onclick=\"setShaderCheck()\" >check</button>" + 
 				"<button type=\"button\" class=\"btn btn-default\" style=\"height: 30px\" data-target=\"#imageModal\" onclick=\"setShaderBroke()\" >break</button>" + 
 				"<label style=\"margin-left: 50px; width: 200px\" class=\"checkbox-inline\"><input id=\"checkboxtoggle\" type=\"checkbox\"  onclick=\"setToggleBrokenOnOff()\" />Show broken</label>" + 				
@@ -809,15 +768,13 @@
 				"<a id=\"error-text\" class=\"form-control\" style=\"margin-left: 20px; margin-top: 3px; width: 280px\" rows=\"1\"></a>" +
 			"</div>" +
 			"<textarea id=\"modal-text\" class=\"form-control\" style=\"width: 480px\" rows=\"20\"></textarea>";
-		document.getElementById("modal-text").value = entitiesDictionary["parent0"].code;
+		document.getElementById("modal-text").value = objectCode;
 		editorGlobal = $("#modal-text")[0];
 	}	
 
 	function setToggleBrokenOnOff () {
 		var value = document.getElementById("checkboxtoggle").value;
 		var editor = $("#modal-text")[0];
-		var objectCode = entitiesDictionary["parent0"].code;
-		var objectCodeBrokered = entitiesDictionary["parent0"].factorizedCode;
 		
 		if (value == "on") 
 			editor.value = objectCodeBrokered;
@@ -831,32 +788,30 @@
 		else
 			setShaderValueOf(targetEntity);
 	}
-
-	function setShaderValueAllParents() {
-		var objectCode = document.getElementById("modal-text").value;	
+		
+	function setShaderValueAllParents() {	
+		objectCode = document.getElementById("modal-text").value;	
 		
 		for (var i=0; i< parentCount; i++) {
 			var canvasId = "parent" + i.toString();
 			
 			entitiesDictionary[canvasId] = {
 				code: objectCode,
-				factorizedCode: objectCode,
 				entityClass: objectClass,
-				functions: parseFunctions(objectCode) };
-			fixFactorizedVars(entitiesDictionary[canvasId]);
+				functions: parseFunctions(objectCode)
+			};
+			
 			ensureTranslatedValue(entitiesDictionary[canvasId]);
 			initializeAndDraw(canvasId);
 		}
 	}
 	
 	function setShaderValueOf(canvasId) {	
-		var objectCode = document.getElementById("modal-text").value;
+		objectCode = document.getElementById("modal-text").value;
 		entitiesDictionary[canvasId] = {
 			code: objectCode,
-			factorizedCode: objectCode,
 			entityClass: objectClass,
 			functions: parseFunctions(objectCode) };
-		fixFactorizedVars(entitiesDictionary[canvasId]);
 		ensureTranslatedValue(entitiesDictionary[canvasId]);
 		initializeAndDraw(canvasId);
 	}
@@ -878,7 +833,7 @@
 			document.getElementById("error-text").innerHTML = "Error translating injections.";
 			return;
 		}
-
+		
 		var result = checkShaderMutation(entity);
 		if (result == "")
 			document.getElementById("error-text").innerHTML = "ok";
@@ -901,34 +856,33 @@
 	}
 	
 	function setShaderBroke() {
-		var entity = entitiesDictionary["parent0"] ;
-	//  objectCode = document.getElementById("modal-text").value;
-		//var entity = { code: objectCode };
+		objectCode = document.getElementById("modal-text").value;
+		var entity = { code: objectCode };
 		//replaceFunctionDefinitions(entity);
 		
 		getBrokedEntity(entity,
 			function (data) {
+				objectCodeBrokered = data;
+				
 				var entity = {
 					code: data,
 					entityClass: objectClass,
 					functions: parseFunctions(data),
 					language: "glsl-dsl"
 				};
-				
-				fixFactorizedVars(entity);
-				
+		
 				// Assign to parent 0
 				var canvasId = "parent0";
 				entitiesDictionary[canvasId] = entity;
 				ensureTranslatedValue(entitiesDictionary[canvasId]);
-				initializeAndDraw(canvasId);
-
+				initializeAndDraw(canvasId);	
+				
 				// #TODO: Create mutations for the rest of the parents
-				for (var i=0; i< childCount; i++) {
+				for (var i=1; i< parentCount; i++) {
 					createFunctionCallMutateOn( 
 						"parent0",
-						"child" + i.toString(),
-						getFunctionIndex("parent0"));
+						"parent" + i.toString(),
+						getFunctionIndex("parent0"));	
 				}
 			});
 	}
@@ -944,7 +898,7 @@
 	<div><input type="button" value="Like" onclick="menuCallbackPrefix(globalSelectedIndex, 1)" style="width: 100px"/></div>
 	<div><input type="button" value="Dislike" onclick="menuCallbackPrefix(globalSelectedIndex, 2)" style="width: 100px"/></div>
 	<div><input type="button" value="Animate" onclick="menuCallbackPrefix(globalSelectedIndex, 4)" style="width: 100px"/ disabled></div>
-	<div><input type="button" value="Edit Code" data-toggle="modal" data-target="#imageModal" onclick="menuCallbackPrefix(globalSelectedIndex, 5)" style="width: 100px"/></div>
+	<div><input type="button" value="Edit" data-toggle="modal" data-target="#imageModal" onclick="menuCallbackPrefix(globalSelectedIndex, 5)" style="width: 100px"/></div>
 </div>
 {% endblock %}
 

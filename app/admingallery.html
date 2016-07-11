@@ -59,9 +59,10 @@
 {% block mainscript %}
 <div id="context_menu" style="border:1px solid black;background-color:#EEEEEE;visibility:hidden;position:absolute; padding-left: 0px;">
 	<div><input type="button" value="Open" onclick="menuCallbackPrefix(globalSelectedIndex, 0)" style="width: 100px"/></div>
-	<div><input type="button" value="Like" onclick="menuCallbackPrefix(globalSelectedIndex, 1)" style="width: 100px"/></div>
-	<div><input type="button" value="Dislike" onclick="menuCallbackPrefix(globalSelectedIndex, 2)" style="width: 100px"/></div>
+	<div><input type="button" value="Admin Like" onclick="menuCallbackPrefix(globalSelectedIndex, 1)" style="width: 100px"/></div>
+	<div><input type="button" value="Admin Dislike" onclick="menuCallbackPrefix(globalSelectedIndex, 2)" style="width: 100px"/></div>
 	<div><input type="button" value="Animate" onclick="menuCallbackPrefix(globalSelectedIndex, 4)" style="width: 100px"/ disabled></div>
+	<div><input type="button" value="Edit" onclick="menuCallbackPrefix(globalSelectedIndex, 5)" style="width: 100px"/></div>
 </div>
 
 <script src="jquery-1.11.1.min.js"></script>
@@ -149,9 +150,8 @@
 		if (result=="default") alert("Default error");
 		var canvasId = ev.target.id;
 		
-		if (result.entityClass == "entity-shader") {		
+		if (result.entityClass == "entity-shader")
 			initializeAndDraw(canvasId);
-		}	
 	}
 	
 	function createFunctionGeneric(canvasId, arguments, message) {
@@ -168,9 +168,8 @@
 				// Agrego id a la entidad
 				galleryDictionary[canvasId].id = result[2].trim();
 				
-				if (galleryDictionary[canvasId].entityClass == "entity-shader") {	
+				if (galleryDictionary[canvasId].entityClass == "entity-shader")
 					initializeAndDraw(canvasId);
-				}
 			},
 			error : function(data) {
 				console.log('Call failed');
@@ -197,13 +196,28 @@
 		else if (index==2) {
 			$.ajax({
 				type : 'GET',
-				url : "/dislike",
-				data : { entity: JSON.stringify(galleryDictionary[name]), entityClass: galleryDictionary.entityClass },
+				url : "/adminDislike",
+				data : { id: galleryDictionary[name].id, entityClass: galleryDictionary[name].entityClass },
 				dataType : "text",
 				success : function(data) { console.log("Dislike " + data + " accepted"); },
 				error : function(data) { console.log('Dislike call failed'); }
 			});			
 		}	
+		else if (index==3) {
+			$.ajax({
+				type : 'GET',
+				url : "/animate",
+				data : { entity: JSON.stringify(galleryDictionary[name]), entityClass: galleryDictionary.entityClass },
+				dataType : "text",
+				success : function(data) { console.log("Dislike " + data + " accepted"); },
+				error : function(data) { console.log('Dislike call failed'); }
+			});			
+		}
+		else if (index==5) {
+			var url_safe_entity = encodeURIComponent(JSON.stringify(galleryDictionary[name]));
+			var url = "/editor-a.html?entity=" + url_safe_entity;
+			window.open(url, "Object inspect");
+		}
 	}
 </script>
 
