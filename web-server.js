@@ -301,7 +301,7 @@ function parseGLSLType(exp, vars, callback) {
 	
 	socket
 		.on('data', function(data) {
-			//console.log("FOR MESSAGE: " + message + " REPLY: " + data);
+						//console.log("FOR MESSAGE: " + message + " REPLY: " + data);console.log("FOR MESSAGE: " + message + " REPLY: " + data);
 			socket.destroy();	
 			callback(data);
 		})
@@ -420,13 +420,21 @@ function registerError (res, args) {
 function deparseTest(res, args) {
 	console.log(args.code);
 	var ast = glsl.parse(args.code);
-	var elements = glsl.query.all(ast, glsl.query.selector('root'));
-	res.end(glsl.string(ast, defaultGLSLCodeOptions));
+	var exp = glsl.string(ast, defaultGLSLCodeOptions);
+	res.end(replaceAllOn(exp, "elseif", "else if"));
 }
 
 function view(res, arguments, h, w) {
 	var localFolder = __dirname + '/app';
 	var result = swig.renderFile(localFolder + "/view.html", { height: (h == null) ? 1024 : h, width: (w == null) ? 1024 : w });
+	var entity = arguments.entity;
+	result = result.toString().replace("#ENTITY#", replaceAllOn(entity, "\n", ""));
+	res.end(result);
+}
+
+function viewHtml(res, arguments, h, w) {
+	var localFolder = __dirname + '/app';
+	var result = swig.renderFile(localFolder + "/viewhtml.html", { height: (h == null) ? 1024 : h, width: (w == null) ? 1024 : w });
 	var entity = arguments.entity;
 	result = result.toString().replace("#ENTITY#", replaceAllOn(entity, "\n", ""));
 	res.end(result);
@@ -457,8 +465,15 @@ function brokeObject (res, arguments) {
 	var value = arguments.code, count = arguments.count;
 	var ast = glsl.parse(value);
 	var elements = glsl.query.all(ast, glsl.query.selector('root'));
-
+	var filterFunctions = arguments.filterFunctions;
+	
+	if (filterFunctions == "")
+		filterFunctions = null;
+	else
+		filterFunctions = filterFunctions.split(" ");
+	
 	var context = { 
+		selectedFunctions: filterFunctions,
 		functions: {},
 		descriptors: [], 
 		lastType: null, 
@@ -504,6 +519,7 @@ function processParts(context, index, callback) {
 				// Create function descriptor with random name
 				var name = "name" + Math.ceil(Math.random() * 1000);
 				var exp = glsl.string(target, defaultGLSLCodeOptions);
+				exp = replaceAllOn(exp, "elseif", "else if");
 				var descriptor = { name: name, vars: varsDescription, type: type, exp: exp, dsl: dsl, flag: false };
 				//console.log("EXP: " + exp)
 				//console.log("")
@@ -619,6 +635,10 @@ function addNode(node, context) {
 		return false;
 	}
 
+	// No agregamos el nodo si no esta dentro de la seleccion
+	if (!checkSelectedFunctionConstraint(context, context.currentFunctionName)) 
+		return;
+	
 	if (node.type == "function_call") {		
 		return !(hasUserDefinedFunction(node));
 	}
@@ -642,6 +662,24 @@ function addNode(node, context) {
 	return false;
 }
 
+function checkSelectedFunctionConstraint(context, name) {
+	var includedFunction = false;
+	for (var i in context.selectedFunctions) {
+		if (context.selectedFunctions[i] == name) {
+			includedFunction = true;
+		}
+	}
+	
+	var selections = context.selectedFunctions;
+	if ((selections != null) && (selections.length > 0) && !includedFunction) {
+		console.log("FOR " + name + " NOT PASSED")
+		return false;
+	}
+	
+	console.log("FOR " + name + " PASSED")
+	return true;
+}
+
 function processTree(node, tabLevel, context) {
 	var tabResult = "";
 	
@@ -653,6 +691,24 @@ function processTree(node, tabLevel, context) {
 			processTree(node.statements[statement], tabLevel, context) 
 		}
 	} 
+	
+	if (node.type == "function_declaration") {
+		context.currentFunctionName = node.name;
+		context.functions[node.name] = {};
+		context.functions[node.name].returnType = node.returnType.name;
+		context.functions[node.name].parameters = {};
+		
+		//console.log(tabResult + node.type + " (" + node.returnType.name + ") " + node.name)
+		for (var parameter in node.parameters) {
+			processTree(node.parameters[parameter], tabLevel, context) 
+		}
+		
+		// Evitamos escanear el cuerpo de la funcion si no hay seleccion
+		if (!checkSelectedFunctionConstraint(context, node.name))
+			return;
+
+		processTree(node.body, tabLevel, context) 
+	}
 	
 	if (node.type == "declarator_item") {
 		//console.log(tabResult + node.type + " " + node.name.name)
@@ -692,19 +748,6 @@ function processTree(node, tabLevel, context) {
 		context.functions[context.currentFunctionName].parameters[node.name] = node.type_name;
 		context.typeTable[context.currentFunctionName + "." + node.name] = node.type_name;
 		context.aliases[node.name] = variableReplacementPrefix + context.aliasesIndex++;
-	}
-
-	if (node.type == "function_declaration") {
-		context.currentFunctionName = node.name;
-		context.functions[node.name] = {};
-		context.functions[node.name].returnType = node.returnType.name;
-		context.functions[node.name].parameters = {};
-		
-		//console.log(tabResult + node.type + " (" + node.returnType.name + ") " + node.name)
-		for (var parameter in node.parameters) {
-			processTree(node.parameters[parameter], tabLevel, context) 
-		}
-		processTree(node.body, tabLevel, context) 
 	}
 	
 	if (node.type == "function_call") {
@@ -1073,6 +1116,7 @@ function getNodeDisplayWithReplacements(node, context) {
 function replaceExpansionNodes(ast, context) {
 	// For each descriptor in object, determine whether to put original or placeholder
 	var result = glsl.string(ast, defaultGLSLCodeOptions);
+	result = replaceAllOn(result, "elseif", "else if");
 	
 	// Make effective replacement on AST
 	for (var descriptor in context.descriptors) {
@@ -1104,7 +1148,9 @@ function requestHandler(req, res) {
 	else if (pathname == "/crossover")
 		crossoverFunctions(res, arguments.language, arguments.objectDataA, arguments.objectDataB, arguments.maxSize);
 	else if (pathname == "/view")
-		view(res, arguments);		
+		view(res, arguments);
+	else if (pathname == "/viewhtml")
+		viewHtml(res, arguments);		
 	else if (pathname == "/viewShaderVariation")
 		viewShaderVariation(res, arguments);		
 	else if (pathname == "/infixConvert")
