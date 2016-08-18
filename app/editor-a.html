@@ -21,30 +21,20 @@
 			<div style="width: 578px">
 				<div id="container-pdiv" class="view-container" style="margin-bottom: 5px; display">
 					<div>
-						<canvas id="parent0" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-						<canvas id="parent1" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-						<canvas id="parent2" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-						<canvas id="parent3" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					{% for j in [0, 1, 2, 3] %}
+						<canvas id="parent{{ j.toString() }}" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					{% endfor %}
 					</div>
 				</div>
 				<div>
-					<input type="submit" value="Operate" onclick="operate()" style="width: 35%; background-color: #5cb85c"/>			
-					<input type="button" value="Operate with gallery" onclick="directedCrossoverFromGallery()" style="width: 35%; background-color: #5cb85c;"/>
+					<input type="submit" value="Randomize" onclick="operate()" style="width: 35%; background-color: #5cb85c"/>			
+					<input type="button" value="Randomize with gallery" onclick="directedCrossoverFromGallery()" style="width: 35%; background-color: #5cb85c;"/ disabled>
 					<input type="submit" value="Break" onclick="setShaderBroke()" style="width: 20%; background-color: #5cb85c"/>			
 				</div>
 				<div id="container-cdiv" class="view-container" style="margin-top: 10px">
-					<canvas id="child0" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child1" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child2" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child3" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child4" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child5" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child6" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child7" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
-					<canvas id="child8" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child9" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>			
-					<canvas id="child10" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
-					<canvas id="child11" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>		
+					{% for j in [0, 1, 2, 3,4, 5, 6, 7, 8, 9, 10, 11] %}
+						<canvas id="child{{ j.toString() }}" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
+					{% endfor %}
 				</div>
 			</div>
 			<div id="comments-div" class="view-container" style="border: 1px solid lightgray;">
@@ -63,17 +53,21 @@
 					<div style="width: 245px">
 						<div style="margin-top: 20px; padding-left: 15px">
 							<div style="display: block">
-								<div>
+								<!--<div>
 									<div class="label">Objective</div>
 									<div style="display: flex; height: 30px; padding-bottom: 7px">
-										<!--<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setShaderPopup()" style="width: 55px">Code</button>-->
-										<!--<div style="width: 5px"></div>-->
 										<select id="fitness-select" style="width: 220px" disabled>
 											<option value="Scene sample">Scene sample</option>
 										</select>
 									</div>
-								</div>
+									</div>-->
 								<div>
+									<div class="label" style="width: 165px">Functions (only for Break operation)</div>
+									<div style="display: flex; height: 30px; padding-bottom: 7px">
+										<input id="input-selected-functions" style="width: 90%" type="text" value=""/>
+									</div>
+								</div>						
+								<!--<div>
 									<div class="label">Evaluator</div>
 									<div style="display: flex; height: 30px; padding-bottom: 7px">
 										<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setEvaluatorPopup()" style="width: 35px">...</button>
@@ -84,7 +78,7 @@
 											<option value="Smooth">Blue</option>
 										</select>
 									</div>
-								</div>
+								</div>-->
 								<div style="display: flex">
 									<div style="display: block">
 										<div class="label">Max size</div>	
@@ -101,19 +95,19 @@
 								</div>
 								<div style="display: flex">
 									<div>
-										<div class="label">Mode</div>	
+										<div class="label">Mode</div>
 										<select style="width: 100px" id="fitness-select" value="operation" disabled>
 											<option value="operation">Operation</option>
 											<option value="inspect">Inspect</option>
 											<option value="search">Search</option>
 										</select>
 									</div>
-									<div>
+									<!--<div>
 										<div class="label">Function</div>	
 										<select style="width: 100px" id="function-select" value="all" disabled>
 											<option value="all">All</option>
 										</select>
-									</div>
+									</div>-->
 								</div>
 								<!--<div>
 									<div class="label">Max time</div>	
@@ -357,8 +351,7 @@
 	
 	function fixFactorizedVars (entity) {
 		if (getStartDelimiters(entity.code).length > 0) {
-			entity.factorizedCode = entity.code;
-			
+			entity.factorizedCode = entity.code;			
 		}
 		entity.code = getProcessedShader(entity);
 	}
@@ -832,8 +825,22 @@
 			setShaderValueOf(targetEntity);
 	}
 
+	function transformIfShaderToyObject(objectCode) {
+		var header = "", footer = "";
+		
+		// Si tiene mainImage y no main, viene de shadertoy
+		if (objectCode.includes("mainImage") && !objectCode.includes("main()")) {
+			header = "precision highp float;\nvarying float xx, yy;\nuniform float time;\nfloat iGlobalTime = time;\nvec2 iResolution = vec2(1.0,1.0);\nvec4 iDate = vec4(0.0, 0.0, 0.0, 0.0);\nvec3 iMouse = vec3(0.0, 0.0, 0.0);\n\n";
+			footer = "\n\nvoid main() {\n\tmainImage(gl_FragColor, vec2(xx, yy));\n}";
+			
+			replaceAll("iDate.w", "iGlobalTime", objectCode);
+		}
+		
+		return header + objectCode + footer;
+	}
+	
 	function setShaderValueAllParents() {
-		var objectCode = document.getElementById("modal-text").value;	
+		var objectCode = transformIfShaderToyObject(document.getElementById("modal-text").value);	
 		
 		for (var i=0; i< parentCount; i++) {
 			var canvasId = "parent" + i.toString();
@@ -850,7 +857,7 @@
 	}
 	
 	function setShaderValueOf(canvasId) {	
-		var objectCode = document.getElementById("modal-text").value;
+		var objectCode = transformIfShaderToyObject(document.getElementById("modal-text").value);
 		entitiesDictionary[canvasId] = {
 			code: objectCode,
 			factorizedCode: objectCode,
@@ -888,11 +895,12 @@
 	
 	function getBrokedEntity(entity, callback) {
 		var maxCount = document.getElementById("input-break-factor").value;
+		var filterFunctions = document.getElementById("input-selected-functions").value;
 		
 		$.ajax({
 			type: 'GET',
 			url: "broke",
-			data: { code: entity.code, count: maxCount },
+			data: { code: entity.code, count: maxCount, filterFunctions: filterFunctions },
 			async: false,
 			dataType: "text",
 			success: callback,
@@ -914,8 +922,8 @@
 					functions: parseFunctions(data),
 					language: "glsl-dsl"
 				};
-				
 				fixFactorizedVars(entity);
+				
 				
 				// Assign to parent 0
 				var canvasId = "parent0";
