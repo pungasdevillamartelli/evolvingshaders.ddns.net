@@ -141,4 +141,11 @@ function drawEntityImage () {
 	setMatrixUniforms();
 	gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
 }
-	
+
+function drawEntityToImage (name) { 
+	drawEntityImage();
+	var canvas = document.getElementById('glCanvas');
+	var data = canvas.toDataURL();
+    $(name).attr('src', data);
+}
+
