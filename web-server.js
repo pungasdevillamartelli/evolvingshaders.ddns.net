@@ -134,10 +134,10 @@ function genericGPExplorerMessage(res, connectFunction, dataFunction) {
 			else
 				res.end(data);
 		})
-		.on('error', function (e) { console.log(e.toString()); })
-		.on('connect', function () { connectFunction(socket); })
-		.on('end', function () { })
-		.on('close', function(data) { });
+		.on('error', function (e) 		{ console.log("ERROR " + e.toString()); })
+		.on('connect', function () 		{ connectFunction(socket); })
+		.on('end', function () 			{ /* console.log("END"); */ })
+		.on('close', function(data) 	{ /* console.log("CLOSE"); */ });
 }
 
 function getInfixConverted(res, exp) {
@@ -432,6 +432,7 @@ function view(res, arguments, h, w) {
 	res.end(result);
 }
 
+// html canvas render version of /view
 function viewHtml(res, arguments, h, w) {
 	var localFolder = __dirname + '/app';
 	var result = swig.renderFile(localFolder + "/viewhtml.html", { height: (h == null) ? 1024 : h, width: (w == null) ? 1024 : w });
@@ -462,6 +463,7 @@ function getEntityByIndex(res, arguments) {
 }
 
 function brokeObject (res, arguments) {
+	var start = new Date();
 	var value = arguments.code, count = arguments.count;
 	var ast = glsl.parse(value);
 	var elements = glsl.query.all(ast, glsl.query.selector('root'));
@@ -485,7 +487,7 @@ function brokeObject (res, arguments) {
 		nodes: {},
 		nodesCount: 0
 	};
-	
+
 	processTree(elements[0], 0, context);
 	//console.log("");
 	//console.log(context);
@@ -499,6 +501,12 @@ function brokeObject (res, arguments) {
 			// #TODO: factorice function replaceExpansionNodes
 			//console.log("");
 			res.end(replaceExpansionNodes(ast, context));
+			
+		/*	// #DEBUG: print stats
+			var end = new Date() - start;
+			console.info("\n\nBroking time: %dms", end);
+			console.info("Broking nodes: %d", context.nodesCount);
+			console.info("Broking functions: %d\n\n", context.functions.length);	*/
 		})
 } 
 
@@ -630,36 +638,36 @@ function addNodeVariables(context, node) {
 
 function addNode(node, context) {
 	//console.log(tabResult + node.type + " (" + node.returnType.name + ") " + node.name)
-
-	if (hasFieldSelector(node)) {
-		return false;
-	}
-
-	// No agregamos el nodo si no esta dentro de la seleccion
-	if (!checkSelectedFunctionConstraint(context, context.currentFunctionName)) 
-		return;
 	
-	if (node.type == "function_call") {		
-		return !(hasUserDefinedFunction(node));
+	// Unknown node
+	var returnValue = false;
+	
+	// Check function filter
+	if (!checkSelectedFunctionConstraint(context, context.currentFunctionName)) 
+		returnValue = false;
+	
+	if (node.type == "function_call") {	
+		returnValue = !(hasUserDefinedFunction(node));
 	}
 
 	if (node.type == "binary")
-		return (!((node.operator.operator == "=") ||
-		         (node.operator.operator == "+=") || 
-		         (node.operator.operator == "-=") || 
-		         (node.operator.operator == "*=") || 
-		         (node.operator.operator == "/=")) &&
-				  (!hasFieldSelector(node.left)) &&
-				  (!hasFieldSelector(node.right)));
+		returnValue = (!((node.operator.operator == "=") ||
+						(node.operator.operator == "+=") || 
+						(node.operator.operator == "-=") || 
+						(node.operator.operator == "*=") || 
+						(node.operator.operator == "/="))) ;
 
 	if (node.type == "identifier")
-		return (context.aliases[node.name] != null);
+		returnValue = (context.aliases[node.name] != null);
 	
 	if (node.type == "float")
-		return true;
+		returnValue = true;
 
-	// #NOTE: unknown
-	return false;
+	if (node.type == "postfix")
+		returnValue = addNode(node.expression);
+
+	//console.log("  TYPE addNode: " + node.type + " " + returnValue.toString());
+	return returnValue;
 }
 
 function checkSelectedFunctionConstraint(context, name) {
@@ -671,12 +679,9 @@ function checkSelectedFunctionConstraint(context, name) {
 	}
 	
 	var selections = context.selectedFunctions;
-	if ((selections != null) && (selections.length > 0) && !includedFunction) {
-		console.log("FOR " + name + " NOT PASSED")
+	if ((selections != null) && (selections.length > 0) && !includedFunction)
 		return false;
-	}
 	
-	console.log("FOR " + name + " PASSED")
 	return true;
 }
 
@@ -725,8 +730,8 @@ function processTree(node, tabLevel, context) {
 	}
 	
 	if (node.type == "declarator") {
-		context.lastType = node.typeAttribute.name;
 		//console.log(tabResult + node.type + " " + node.typeAttribute.name)
+		context.lastType = node.typeAttribute.name;
 		for (var d in node.declarators) {
 			processTree(node.declarators[d], tabLevel, context);
 		}
@@ -788,14 +793,28 @@ function processTree(node, tabLevel, context) {
 
 	if (node.type == "postfix") {
 		//console.log(tabResult + node.type);
-		processTree(node.operator, tabLevel, context);
-		processTree(node.expression, tabLevel, context);
+		if (addNode(node.expression, context)) {
+			addNodeVariables(context, node);
+		}
+		else {
+			processTree(node.operator, tabLevel, context);
+			processTree(node.expression, tabLevel, context);
+		}
 	}
 
 	if (node.type == "field_selector") {
+		//console.log(tabResult + node.type);
+		//console.log("ERROR REACHED FIELD_SELECTOR");
 		//console.log(tabResult + node.type + " " + node.selection);
 		//context.fieldSelector = node.selection;
-		processTree(node.expression, tabLevel, context);
+		
+	/*	if (addNode(node.expression, context)) {
+			processTree(node.expression, tabLevel, context);
+		}
+		else {
+			processTree(node.operator, tabLevel, context);
+			processTree(node.expression, tabLevel, context);
+		} */
 	}
 
 	if (node.type == "identifier") {
@@ -895,7 +914,8 @@ function heuristicValue(node) {
 	//  - exp has math functions inside (good candidate): sin,cos,tan,length,distance,...
 	
 	// #TEST: check how faster is to make lispworks call
-	if (hasUserDefinedFunction(node)) return false;
+	if (hasUserDefinedFunction(node)) 
+		return false;
 
 	return true;
 }
@@ -940,35 +960,14 @@ function hasUserDefinedFunction(node) {
 				return true;
 		return false;
 	}
-
+	
+	if (node.type == "postfix") {
+		return hasUserDefinedFunction(node.expression);
+	}
+	
 	// Continue on AST 
 	if ((node.expression) || (node.binary)) 
 		return hasUserDefinedFunction(node.expression);	
-}
-
-function hasFieldSelector(node) {
-	// Check terminal nodes and return
-	if ((node.type == "operator") || (node.type == "binary")) {
-		if (hasFieldSelector(node.left))
-			return true;
-		return (hasFieldSelector(node.right));
-	}
-
-	if ((node.type == "field_selector") || (node.type == "postfix")) {
-		return true;
-	}
-	
-	// Register not buildt in functions
-	if (node.type == "function_call") {
-		for (var parameter in node.parameters)
-			if (hasFieldSelector(node.parameters[parameter]))
-				return true;
-		return false;
-	}
-
-	// Continue on AST 
-	if ((node.expression) || (node.binary)) 
-		return hasFieldSelector(node.expression);
 }
 
 /*
@@ -1014,6 +1013,8 @@ function getNodeDisplay(node, context) {
 	if (node.type == "identifier") {
 		return node.name;
 	}
+	
+	// Function call
 	if ((node.type == "function_call") && (isBuiltInFunction(node.function_name))) {
 		var result = node.function_name;
 		for (var parameter in node.parameters)
@@ -1027,6 +1028,8 @@ function getNodeDisplay(node, context) {
 		return "(" + result + ")";
 	}
 
+	// postfix ?? 
+	
 	// Continue on AST 
 	if (node.expression) 
 		return getNodeDisplay(node.expression, context);
@@ -1038,29 +1041,28 @@ function getNodeDisplay(node, context) {
 }
 
 function valueForSelectorIndex(c) {
-	if ((c == "x") || (c == "r")) return 1;
-	if ((c == "y") || (c == "g")) return 2;
-	if ((c == "z") || (c == "b")) return 3;
-	if ((c == "a")) return 4;
+	if ((c == "x") || (c == "r") || (c == "s")) return 0;
+	if ((c == "y") || (c == "g") || (c == "t")) return 1;
+	if ((c == "z") || (c == "b")) return 2;
+	if ((c == "a")) return 3;
 }
 
 function valueForSelector(str) {
 	var result = "";
-	for (var i in str) {
-		result += valueForSelectorIndex(str[i]);
-	}
+	for (var i in str.selection)
+		result += valueForSelectorIndex(str.selection[i]);
 	return result;
 }
 
 function fieldSelectorForOperator (value) {
-	return "fieldselection" + valueForSelector(value);
+	return "fs-" + valueForSelector(value);
 }
 
 function getSubExpWithReplacements(node, context) {
 	return getNodeDisplayWithReplacements(node, context);
 }
 
-function getNodeDisplayWithReplacements(node, context) {		
+function getNodeDisplayWithReplacements(node, context) {
 	// Check terminal nodes and return
 	if (node.type == "operator")
 		return "(" + node.operator.operator + " " + getNodeDisplayWithReplacements(node.left, context) + " " + getNodeDisplayWithReplacements(node.right, context) + ")";
@@ -1135,14 +1137,14 @@ function replaceExpansionNodes(ast, context) {
 function requestHandler(req, res) {	
 	var pathname = url.parse(req.url).pathname;
 	var arguments = querystring.parse(url.parse(req.url).query);
-	
+
 	// #TEMP: incoming inspector
 	console.log(datePrint() + " : " + req.connection.remoteAddress + ": " + pathname + "{" + arguments.toString() + "}");
 	
 	if (pathname == "/mutateWithVars")
 		mutateFunctionsWithVars(res, arguments); 
 	else if (pathname == "/crossoverWithVars")
-		crossoverWithVars(res, arguments);	
+		crossoverWithVars(res, arguments);
 	else if (pathname == "/mutate")	
 		mutateFunctions(res, arguments.language, arguments.entity, arguments.maxSize);
 	else if (pathname == "/crossover")
@@ -1150,9 +1152,9 @@ function requestHandler(req, res) {
 	else if (pathname == "/view")
 		view(res, arguments);
 	else if (pathname == "/viewhtml")
-		viewHtml(res, arguments);		
+		viewHtml(res, arguments);
 	else if (pathname == "/viewShaderVariation")
-		viewShaderVariation(res, arguments);		
+		viewShaderVariation(res, arguments);
 	else if (pathname == "/infixConvert")
 		getInfixConverted(res, arguments.exp);
 	else if (pathname == "/glslConvert")
@@ -1172,7 +1174,7 @@ function requestHandler(req, res) {
 	else if (pathname == "/adminLike")
 		adminLikeObject(res, arguments);
 	else if (pathname == "/adminDislike")
-		adminDislikeObject(res, req, arguments);	
+		adminDislikeObject(res, req, arguments);
 	else if (pathname == "/broke")
 		brokeObject(res, arguments);
 	else if (pathname == "/dislike")
