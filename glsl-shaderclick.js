@@ -1,3 +1,4 @@
+var explorer = require('./explorer');
 
 module.exports = {
 	brokeObject: brokeObject,
@@ -51,7 +52,7 @@ function brokeObject (res, arguments) {
 			filterParts(context, count);
 			// #TODO: factorice function replaceExpansionNodes
 			res.end(replaceExpansionNodes(ast, context));
-			debug.debugStatus(start);
+			debug.debugStatus(context, start);
 		})
 } 
 
@@ -62,7 +63,6 @@ function deparseTest(res, args) {
 	res.end(replaceAllOn(exp, "elseif", "else if"));
 }
 
-
 function processParts(context, index, callback) {
 	var counter = 0;
 	var targetNode;
@@ -72,7 +72,7 @@ function processParts(context, index, callback) {
 	var varsDescription = context.nodes[index][1];
 	var dsl = getSubExpWithReplacements(target, context);
 	
-	parseGLSLType(dsl,
+	explorer.parseGLSLType(dsl,
 		varsDescription,
 		function(type) {
 			if ((type != null) && (type != "nil") && (type != "NIL")) {

@@ -154,10 +154,10 @@ function parseGLSLType(exp, vars, callback) {
 	
 	socket
 		.on('data', function(data) {
-			debug.debugReplyMessage(message, data);
-			socket.destroy();	
-			callback(data);
-		})
+						debug.debugReplyMessage(message, data);
+						socket.destroy();
+						callback(data);
+					})
 		.on('error', function (e) { console.log(e.toString()); })
 		.on('connect', function () { connectFunction(socket); })
 		.on('end', function () { })

@@ -56,7 +56,7 @@ module.exports = {
 		//console.log(context);
 		//console.log("");
 	},
-	debugStatus: function (start) {
+	debugStatus: function (context, start) {
 		var end = new Date() - start;
 		console.info("\n\nBroking time: %dms", end);
 		console.info("Broking nodes: %d", context.nodesCount);

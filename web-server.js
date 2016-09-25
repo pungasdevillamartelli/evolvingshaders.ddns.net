@@ -14,10 +14,10 @@ var http = require('http'),
 	glslprocessing = require('./glsl-shaderclick');
 
 // Configuration
-http.globalAgent.maxSockets = 20;
 var requestTimeOut = 45000;
 var listeningPort = 80;
 
+http.globalAgent.maxSockets = 20;
 swig.setDefaults({ cache: false });
 
 
