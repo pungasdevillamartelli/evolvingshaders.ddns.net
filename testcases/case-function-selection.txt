@@ -1,0 +1,38 @@
+precision highp float;
+varying float xx, yy;
+uniform float time;
+vec2 iResolution = vec2(1.0, 1.0);
+
+vec4 A(vec2 av) {
+return vec4(av,0.5+0.5*sin(time),1.0);
+}
+
+vec4 B(vec2 bv) {
+return vec4(bv,0.5+0.5*sin(time),1.0);
+}
+
+vec4 C(vec2 cv) {
+return vec4(cv,0.5+0.5*sin(time),1.0);
+}
+
+vec4 D(vec2 dv) {
+return vec4(dv,0.5+0.5*sin(time),1.0);
+}
+
+void mainImage( out vec4 fragColor, in vec2 fragCoord )
+{
+	vec2 uv = fragCoord.xy / iResolution.xy;
+    if (uv.y < 0.33) {
+		fragColor = A(uv);
+	}
+    else if (uv.y < 0.66) {
+		fragColor = B(uv);
+	}
+    else if (uv.y < 1.00) {
+		fragColor = C(uv);
+	}
+}
+
+void main() {
+	mainImage(gl_FragColor, vec2(xx, yy));
+}

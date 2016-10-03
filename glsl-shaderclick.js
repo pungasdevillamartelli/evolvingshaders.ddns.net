@@ -6,9 +6,9 @@ module.exports = {
 }
 
 var defaultGLSLCodeOptions = {
-	tab: '\t',       
-	space: ' ',      
-	newline: '\n',  
+	tab: '\t',
+	space: ' ',
+	newline: '\n', 
 	terminator: ';', 
 	comma: ','
 };
@@ -57,10 +57,9 @@ function brokeObject (res, arguments) {
 } 
 
 function deparseTest(res, args) {
-	console.log(args.code);
 	var ast = glsl.parse(args.code);
 	var exp = glsl.string(ast, defaultGLSLCodeOptions);
-	res.end(replaceAllOn(exp, "elseif", "else if"));
+	res.end(utils.replaceAllOn(exp, "elseif", "else if"));
 }
 
 function processParts(context, index, callback) {
@@ -70,6 +69,7 @@ function processParts(context, index, callback) {
 	for (var t in context.nodes) counter++;
 	var target = context.nodes[index][0];
 	var varsDescription = context.nodes[index][1];
+	context.currentFunctionName = context.nodes[index][2];
 	var dsl = getSubExpWithReplacements(target, context);
 	
 	explorer.parseGLSLType(dsl,
@@ -233,7 +233,6 @@ function processTree(node, tabLevel, context) {
 	}
 
 	if (node.type == "postfix") {
-		//console.log(tabResult + node.type);
 		if (addNode(node.expression, context)) {
 			addNodeVariables(context, node);
 		}
@@ -518,8 +517,12 @@ function getNodeDisplayWithReplacements(node, context) {
 		// Register variable and alias
 		if (context.aliases[context.currentFunctionName + "." + key] != null)
 			return context.aliases[context.currentFunctionName + "." + key];
-		else 
+		else {
+			if (context.aliases["null." + key] != null)
+				return context.aliases["null." + key];
+			console.log("ERROR: ALIAS NOT FOUND FOR " + context.currentFunctionName + "." + key);			
 			return node.name;
+		}
 	}
 
 	if (node.type == "function_call") {
@@ -556,7 +559,7 @@ function replaceExpansionNodes(ast, context) {
 	for (var descriptor in context.descriptors) {
 		var d = context.descriptors[descriptor];
 		if (d.descriptor.flag == true)
-			result = replaceAll(d.descriptor.name, getDescriptorDescriptor(d.descriptor), result);
+			result = utils.replaceAll(d.descriptor.name, getDescriptorDescriptor(d.descriptor), result);
 		else
 			result = utils.replaceAllOn(result, d.descriptor.name, d.descriptor.exp);
 	}
@@ -602,12 +605,12 @@ function getVarsDescription(vars) {
 function addNodeVariables(context, node) {
 	var vars = getVarsForExpression(context, node);
 	var varsDescription = getVarsDescription(vars);
-	context.nodes[context.nodesCount.toString()] = [node, varsDescription];
+	context.nodes[context.nodesCount.toString()] = [node, varsDescription, context.currentFunctionName];
 	context.nodesCount++;
 }
 
 function addNode(node, context) {
-	//console.log(tabResult + node.type + " (" + node.returnType.name + ") " + node.name)
+	//debug.debugAddNode(node);
 	
 	// Unknown node
 	var returnValue = false;
@@ -627,8 +630,12 @@ function addNode(node, context) {
 						(node.operator.operator == "*=") || 
 						(node.operator.operator == "/="))) ;
 
-	if (node.type == "identifier")
+	if (node.type == "identifier") {
 		returnValue = (context.aliases[context.currentFunctionName + "." + node.name] != null);
+		if (returnValue == false) {
+			console.log("ERROR: IDENTIFIER NOT ALIASED: " + context.currentFunctionName + "." + node.name);
+		}
+	}
 	
 	if (node.type == "float")
 		returnValue = true;
@@ -636,17 +643,14 @@ function addNode(node, context) {
 	if (node.type == "postfix")
 		returnValue = addNode(node.expression);
 
-	//console.log("  TYPE addNode: " + node.type + " " + returnValue.toString());
 	return returnValue;
 }
 
 function checkSelectedFunctionConstraint(context, name) {
 	var includedFunction = false;
-	for (var i in context.selectedFunctions) {
-		if (context.selectedFunctions[i] == name) {
+	for (var i in context.selectedFunctions)
+		if (context.selectedFunctions[i] == name)
 			includedFunction = true;
-		}
-	}
 	
 	var selections = context.selectedFunctions;
 	if ((selections != null) && (selections.length > 0) && !includedFunction)
