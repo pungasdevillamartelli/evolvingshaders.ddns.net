@@ -632,8 +632,13 @@ function addNode(node, context) {
 
 	if (node.type == "identifier") {
 		returnValue = (context.aliases[context.currentFunctionName + "." + node.name] != null);
+		
 		if (returnValue == false) {
-			console.log("ERROR: IDENTIFIER NOT ALIASED: " + context.currentFunctionName + "." + node.name);
+			returnValue = (context.aliases["null." + node.name] != null);
+		
+			if (returnValue == false) {
+				console.log("ERROR: IDENTIFIER NOT ALIASED: " + context.currentFunctionName + "." + node.name);
+			}	
 		}
 	}
 	
