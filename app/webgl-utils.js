@@ -20,8 +20,8 @@ function initGLForText(canvas) {
 
 function initGL(canvas) {
 	try {
-		gl = canvas.getContext("experimental-webgl");
-		gl.viewportWidth = canvas.width;
+		gl = canvas.getContext("experimental-webgl", { preserveDrawingBuffer: true });
+		gl.viewportWidth = canvas.width; 
 		gl.viewportHeight = canvas.height;
 	} 
 	catch (e) {

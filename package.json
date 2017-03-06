@@ -1,0 +1,37 @@
+{
+  "name": "shadermutator",
+  "version": "0.1.0",
+  "description": "Shader mutator",
+  "main": "web-server.js",
+  "directories": {
+    "doc": "doc"
+  },
+  "dependencies": {
+    "fine-uploader": "^5.11.10",
+    "glsl-man": "^1.0.7",
+    "mongoose": "^4.5.3",
+    "node-uuid": "^1.4.7",
+    "swig": "^1.4.2",
+    "uuid": "^3.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/pungasdevillamartelli/shaderclick.git"
+  },
+  "keywords": [
+    "glsl",
+    "mutation",
+    "fragment",
+    "shaders"
+  ],
+  "author": "Sebastián Fonte & PVM",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/pungasdevillamartelli/shaderclick/issues"
+  },
+  "homepage": "https://github.com/pungasdevillamartelli/shaderclick#readme"
+}
