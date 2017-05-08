@@ -32,7 +32,7 @@
 					<input type="submit" value="Break" onclick="setShaderBroke()" style="width: 20%; background-color: #5cb85c"/>			
 				</div>
 				<div id="container-cdiv" class="view-container" style="margin-top: 10px">
-					{% for j in [0, 1, 2, 3,4, 5, 6, 7, 8, 9, 10, 11] %}
+					{% for j in [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11] %}
 						<canvas id="child{{ j.toString() }}" width="128" height="128" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>
 					{% endfor %}
 				</div>
@@ -594,6 +594,20 @@
 			});
 	}
 	
+	function addChildCallBack(name) {
+		$("#" + name)
+			.click(function(evt) {
+				for (var i=0; i< childCount; i++) {
+					var canvasId = "child" + i.toString();
+					
+					if (name != canvasId) {	
+						if (entitiesDictionary[name] && (entitiesDictionary[name].functions.length > 0))
+							createFunctionCallMutateOn(name, canvasId, getFunctionIndex(name));
+					}
+				}
+			});
+	}
+	
 	function directedCrossoverFromGallery(name) {
 		for (var i=0; i< childCount; i++) {
 			var canvasId = "child" + i.toString();
@@ -719,7 +733,7 @@
 		gl.shaderSource(vertexShader, myVertexShaderSrc);
 		gl.compileShader(vertexShader);
 		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-		fixFactorizedVars(enitity);
+		fixFactorizedVars(entity);
 		gl.shaderSource(fragmentShader, entity.code);
 		gl.compileShader(fragmentShader);
 		shaderProgram = gl.createProgram();
@@ -910,10 +924,10 @@
 	
 	function setShaderBroke() {
 		var entity = entitiesDictionary["parent0"] ;
-	//  objectCode = document.getElementById("modal-text").value;
+		//objectCode = document.getElementById("modal-text").value;
 		//var entity = { code: objectCode };
 		//replaceFunctionDefinitions(entity);
-		
+
 		getBrokedEntity(entity,
 			function (data) {
 				var entity = {
@@ -924,14 +938,12 @@
 				};
 				fixFactorizedVars(entity);
 				
-				
 				// Assign to parent 0
 				var canvasId = "parent0";
 				entitiesDictionary[canvasId] = entity;
 				ensureTranslatedValue(entitiesDictionary[canvasId]);
 				initializeAndDraw(canvasId);
 
-				// #TODO: Create mutations for the rest of the parents
 				for (var i=0; i< childCount; i++) {
 					createFunctionCallMutateOn( 
 						"parent0",
@@ -943,6 +955,9 @@
 
 	for (var i=0; i< parentCount; i++) 
 		addParentCallBack("parent" + i);
+	for (var i=0; i< childCount; i++) 
+		addChildCallBack("child" + i);
+		
 	initializeContextMenuOn("child", "context_menu", menuSetCallback);
 	initializeContextMenuOn("parent", "context_menu", menuSetCallback);
 </script>
