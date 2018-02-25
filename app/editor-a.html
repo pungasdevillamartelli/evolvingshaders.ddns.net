@@ -41,7 +41,7 @@
 				<div class="modal fade" id="imageModal" role="dialog" aria-hidden="true" >
 				  <div class="modal-dialog">
 					<div class="modal-content">
-					  <div id="modal-container" class="modal-body" style="width: 100%; display: block">
+					  <div id="modal-container" class="modal-body" style="width: 100%; display: block; max-height: 450px">
 						<input id="modal-text" rows="20">
 						<button type="button" class="btn btn-default" data-toggle="modal" data-target="#imageModal" onclick="setShaderValue()" >set</button>
 						<button type="button" class="btn btn-default" style="height: 30px" data-toggle="modal" data-target="#imageModal" onclick="setShaderValueAllParents()" >set all</button>						
@@ -797,7 +797,7 @@
 					" " + 
 					"<a id=\"error-text\" class=\"form-control\" style=\"margin-left: 20px; margin-top: 3px; width: 280px\" rows=\"1\"></a>" +
 				"</div>" +
-				"<textarea id=\"modal-text\" class=\"form-control\" style=\"width: 480px\" rows=\"20\"></textarea>";
+				"<textarea id=\"modal-text\" class=\"form-control\" style=\"width: 480px; width: 512px\" rows=20 \"></textarea>";
 			document.getElementById("modal-text").value = entitiesDictionary[name].code;
 			editorGlobal = $("#modal-text")[0];
 		}
