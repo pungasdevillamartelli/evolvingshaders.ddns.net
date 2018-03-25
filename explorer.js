@@ -17,14 +17,16 @@ module.exports = {
 var connectedGPExplorerImages;
 var net = require('net'),
 	utils = require('./utils');
+var explorerAddress = "127.0.0.1";
+var explorerBasePort = 20000;
 
 function initializeGPExplorerImages() {
 	connectedGPExplorerImages = 1;
 }
 
 function createGPExplorerSocket() {
-	var value = 20000 + Math.ceil(Math.random() * 1000) % connectedGPExplorerImages;
-	return net.createConnection(value.toString(), "127.0.0.1");
+	var value = explorerBasePort + Math.ceil(Math.random() * 1000) % connectedGPExplorerImages;
+	return net.createConnection(value.toString(), explorerAddress);
 }
 
 function genericGPExplorerMessage(res, connectFunction, dataFunction) {
@@ -90,6 +92,7 @@ function mutateFunctionsWithVars(res, arguments) {
 			socket.write(message);
 		},
 		function(data) {
+			// #TODO: REFACTOR using JSON
 			var result = data.toString().split("|")[1].trim().toLowerCase();
 			var dslValue = data.toString().split("|")[0].trim();
 			var parts = vars.split("(");
@@ -124,6 +127,7 @@ function crossoverWithVars(res, arguments) {
 			socket.write(message);
 		},
 		function(data) {
+			// #TODO: REFACTOR using JSON
 			var result = data.toString().split("|")[1].trim().toLowerCase();
 			var dslValue = data.toString().split("|")[0].trim();
 			var parts = vars.split("(");
@@ -144,8 +148,44 @@ function crossoverWithVars(res, arguments) {
 		});
 }
 
-function parseGLSLType(exp, vars, callback) {
+function evolveStep(res, arguments) {
+	var language = arguments.language, 
+		expA = arguments.expA, 
+		expB = arguments.expB, 
+		vars = arguments.vars, 
+		maxSize = arguments.maxSize;
+
+	genericGPExplorerMessage(
+		res, 
+		function(socket) {
+			var message = "(make-instance 'tcp-message :name (quote message-web-interface-crossover-with-vars) :content (list (quote GLSL-GRAMMAR-TEST) (quote " + vars + ") (quote " + expA + ") (quote " + expB + ") " + maxSize + "))\n";
+			socket.write(message);
+		},
+		function(data) {
+			var result = data.toString().split("|")[1].trim().toLowerCase();
+			var dslValue = data.toString().split("|")[0].trim();
+			var parts = vars.split("(");
+			
+			for (var part in parts) {
+				var p = parts[part];
+				
+				if ((p != "") && (p != ")") && (p != "))")) {
+					// Get variable names
+					p = utils.replaceAllOn(p, ")", "");
+					var varspart = p.split(" ");
+					// Replace
+					result = utils.replaceAllOn(result, varspart[0].toLowerCase(), varspart[2]);
+				}
+			}
+			
+			res.end(dslValue + "|" + result);
+		});
+}
+
+function parseGLSLType(exp, vars, callback) {createGPExplorerSocket
 	var socket = net.createConnection("20000", "127.0.0.1");
+	//var value = GPExplorerBasePort + Math.ceil(Math.random() * 1000) % connectedGPExplorerImages;
+	//var socket = net.createConnection(explorerAddress, value.toString(), );
 	var message = "(make-instance 'tcp-message :name (quote message-web-interface-glsl-parse-result) " +
 						":content (list (quote GLSL-GRAMMAR-TEST) (quote " + exp + ") (quote " + vars + ")))\n";
 	var connectFunction = function(socket) {
