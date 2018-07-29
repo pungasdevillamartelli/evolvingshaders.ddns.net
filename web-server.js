@@ -53,7 +53,8 @@ function requestHandler(req, res) {
 	var arguments = querystring.parse(url.parse(req.url).query);
 
 	debug.debugIncomingRequest(res, pathname, arguments);
-	
+	console.log("HOST: " + req.headers.host);
+
 	if (pathname == "/view")
 		view(res, arguments);
 	else if (pathname == "/viewhtml")
@@ -65,6 +66,8 @@ function requestHandler(req, res) {
 		explorer.mutateFunctionsWithVars(res, arguments); 
 	else if (pathname == "/crossoverWithVars")
 		explorer.crossoverWithVars(res, arguments);
+	else if (pathname == "/evolveStep")
+		explorer.evolveStep(res, arguments);
 	else if (pathname == "/mutate")	
 		explorer.mutateFunctions(res, arguments.language, arguments.entity, arguments.maxSize);
 	else if (pathname == "/crossover")
@@ -74,7 +77,7 @@ function requestHandler(req, res) {
 	else if (pathname == "/glslConvert")
 		explorer.getGlslConvert(res, arguments.exp);
 	else if (pathname == "/broke")
-		glslprocessing.brokeObject(res, arguments);
+		glslprocessing.factorizeObject(res, arguments);
 	else if (pathname == "/deparseTest")
 		glslprocessing.deparseTest(res, arguments);	
 	// Database operations
@@ -91,14 +94,15 @@ function requestHandler(req, res) {
 	else if (pathname == "/dislike")
 		db.dislikeObject(res, arguments);
 	else if (pathname == "/registerError")
-		db.registerError(res, arguments);		
+		db.registerError(res, arguments);
 	else if (pathname == "/adminLike")
 		db.adminLikeObject(res, arguments);
 	else if (pathname == "/adminDislike")
 		db.adminDislikeObject(res, req, arguments);
 	else if (pathname == "/addShaderEntity")
 		db.registerShaderEntity(res, arguments);	
-	else if ((pathname == "/editor-a.html") || (pathname == "/editor-b.html") || (pathname == "/editor-c.html"))
+	else if ((pathname == "/editor-a.html") || (pathname == "/editor-b.html") || 
+			 (pathname == "/editor-c.html") || (pathname == "/editor-code.html"))
 		getEditor(pathname, res, arguments);
 	else {
 		console.log("URL : " + req.url);

@@ -36,21 +36,23 @@ function getFile(filePath, res, page404, useViewsEngine){
 				res.end(result);
 			}
 			else
-				fs.readFile(filePath,function(err,contents){
+				fs.readFile(filePath,function(err, contents){
 					if(!err){
 						res.end(contents);
 					} else {
 						console.dir(err);
+						res.end();
 					};
 				});
         } 
 		else {
-            fs.readFile(page404, function(err,contents){
+            fs.readFile(page404, function(err, contents){
                 if (!err) {
                     res.writeHead(404, {'Content-Type': 'text/html'});
                     res.end(contents);
                 } else {
                     console.dir(err);
+					res.end();
                 };
             });
         };

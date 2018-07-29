@@ -10,12 +10,13 @@ module.exports = {
 	getAdminLikeWithCriteria: getAdminLikeWithCriteria,
 	deleteEntity: deleteEntity,
 	adminLikeObject: adminLikeObject,
-	adminDislikeObject: getEntityByIndex,
+	adminDislikeObject: adminDislikeObject,
 	likeObject: likeObject,
 	dislikeObject: dislikeObject,
 	registerShaderEntity: registerShaderEntity,
 	registerError: registerError
 }
+
 
 function initializeDatabase() {	
 	// Entities
@@ -69,8 +70,8 @@ function initializeDatabase() {
 	ErrorEntry = db.model('errorentries', errorEntriesSchema);
 }
 
-function getEntityByIndex(res, arguments) {	
-	var args = arguments.index;
+function getEntityByIndex(res, args) {	
+	var args = args.index;
 	var entity = Entity.find({ }, function(err, entities) {
 		if (args < entities.length) {
 			var result = replaceAllOn(entities[args].object, "\n", "");
@@ -81,8 +82,8 @@ function getEntityByIndex(res, arguments) {
 	});
 }
 
-function getWithCriteria(res, req, arguments) {
-	var a = Like.find({ entityClass: arguments.entityClass }, function(err, likes) {
+function getWithCriteria(res, req, args) {
+	var a = Like.find({ entityClass: args.entityClass }, function(err, likes) {
 		var value = Math.random() * likes.length;
 		var result = likes[Math.floor(value)];
 	
@@ -93,8 +94,8 @@ function getWithCriteria(res, req, arguments) {
 	}); 
 }
 
-function getAdminLikeWithCriteria(res, req, arguments) {
-	var a = AdminLike.find( null /* { entityClass: arguments.entityClass } */, function(err, adminlikes) {
+function getAdminLikeWithCriteria(res, req, args) {
+	var a = AdminLike.find( null /* { entityClass: args.entityClass } */, function(err, adminlikes) {
 		var value = Math.random() * adminlikes.length;
 		var result = adminlikes[Math.floor(value)];
 		if (result != null)	
@@ -104,10 +105,10 @@ function getAdminLikeWithCriteria(res, req, arguments) {
 	}); 
 }
 
-function deleteEntity(res, arguments) {
-	Entity.remove( { id: arguments.id }, 
+function deleteEntity(res, args) {
+	Entity.remove( { id: args.id }, 
 		function () {
-			res.end(arguments.id);
+			res.end(args.id);
 		});
 }
 
@@ -118,12 +119,12 @@ function adminLikeObject(res, args) {
 	res.end(id);
 }
 
-function adminDislikeObject(res, req, arguments) {
-	console.log("ID: " + arguments.id)
-	var a = AdminLike.findOne( { id: arguments.id }, function(err, objects) {
+function adminDislikeObject(res, req, args) {
+	console.log("ID: " + args.id)
+	var a = AdminLike.findOne( { id: args.id }, function(err, objects) {
 		if (objects != null)
 			objects.remove(function (err) {if (err) throw err; });
-		console.log("Deleted " + arguments.id);
+		console.log("Deleted " + args.id);
 	}); 
 	res.end("ok");
 }
@@ -157,7 +158,7 @@ function registerError (res, args) {
 	res.end();
 }
 
-var printBDError = function (err, result) {
+function printBDError (err, result) {
       if (err) throw err;
       console.log(result);
-};
+}

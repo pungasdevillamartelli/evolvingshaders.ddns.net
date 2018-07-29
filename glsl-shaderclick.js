@@ -1,7 +1,7 @@
 var explorer = require('./explorer');
 
 module.exports = {
-	brokeObject: brokeObject,
+	factorizeObject: factorizeObject,
 	deparseTest: deparseTest
 }
 
@@ -16,7 +16,7 @@ var defaultGLSLCodeOptions = {
 var variableReplacementPrefix = "vvv";
 
 
-function brokeObject (res, arguments) {
+function factorizeObject (res, arguments) {
 	var start = new Date();
 	var value = arguments.code, count = arguments.count;
 	var ast = glsl.parse(value);
@@ -48,9 +48,8 @@ function brokeObject (res, arguments) {
 	processParts(context,
 		0,
 		function(context) {
-			// Reeplace nodes
+			// Replace nodes
 			filterParts(context, count);
-			// #TODO: factorice function replaceExpansionNodes
 			res.end(replaceExpansionNodes(ast, context));
 			debug.debugStatus(context, start);
 		})
@@ -158,7 +157,7 @@ function processTree(node, tabLevel, context) {
 		for (var parameter in node.parameters) 
 			processTree(node.parameters[parameter], tabLevel, context) 
 		
-		// Evitamos escanear el cuerpo de la funcion si no hay seleccion
+		// Don't scan the function if no selection
 		if (!checkSelectedFunctionConstraint(context, node.name))
 			return;
 
