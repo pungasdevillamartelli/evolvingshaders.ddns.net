@@ -1,0 +1,329 @@
+{% extends 'mutation-layout.html' %}
+
+{% block title %}Evolving shaders{% endblock %}
+
+{% block head %}
+{% parent %}
+{% endblock %}	
+
+{% block body %}
+<body onload="startupDraw()" style="background-color: gray">
+{% endblock %}
+
+{% block content %}
+{% parent %}
+	<div class="container" style="padding-top: 60px; width: 950px;">
+		<div id="main-div" style="display: flex">
+			<div style="width: 500px; padding-right: 10px;">
+				<canvas id="parent0" width="384" height="384" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>				
+			</div>
+			<div id="container-pdiv" class="view-container" style="margin-bottom: 5px;">
+				<textarea id="text-editor" class="form-control" style="margin: 0px 0px 10px; width: 555px; height: 375px" rows="60"></textarea>
+				<input type="submit" value="Apply" onclick="applyCode()" style="width: 15%; background-color: #5cb85c"/>			
+			</div>
+		</div>
+	</div>
+{% endblock %}
+
+{% block mainscript %}
+<script src="jquery-1.11.1.min.js"></script>
+<script src="bootstrap.min.js"></script>
+
+<script>
+	var entitiesDictionary = {};
+	var objectClass = "entity-shader",
+		objectFile = "/example-scene-mutate-a.c", 
+		objectErrorFile = "/example-scene-mutate-error.c",
+		fragmentErrorShaderSource,
+		defaultEntity = null;
+
+	function replaceAll(find, replace, str) {
+		return str.replace(new RegExp(find, 'g'), replace);
+	}
+
+	function allowDrop(ev) {
+		ev.preventDefault();
+	}
+
+	function drag(ev) {
+		ev.dataTransfer.setData("Text", JSON.stringify(entitiesDictionary[ev.target.id]));
+	}
+
+	function drop(ev) {
+		ev.preventDefault();
+		var result = JSON.parse(ev.dataTransfer.getData("Text"));
+		entitiesDictionary[ev.target.id] = result;
+		if (result == "default") alert("Default error");
+		initializeAndDraw(ev.target.id);
+	}
+	
+	function resetParents() {
+		createFunctionCallCreateDefaults();
+	}
+	
+	function resetTime() {
+		resetTimer();
+		
+		if (entitiesDictionary["parent0"])
+			initializeAndDraw("parent0");
+	}
+	
+	function startupDraw() {
+		// Read initial shader
+		$.ajax({
+			type: 'GET',
+			url: objectFile,
+			data: { },
+			async: false,
+			dataType: "text",
+			success: function(data) { 
+				$("#text-editor")[0].value = data;
+				createFunctionCallCreateDefaults();
+			},
+			error: function(data) { console.log('Source shader not found'); }
+		});
+		
+		// Read error shader
+		$.ajax({
+			type: 'GET',
+			url: objectErrorFile,
+			data: { },
+			async: false,
+			dataType: "text",
+			success: function(data) { fragmentErrorShaderSource = data; },
+			error: function(data) { console.log('Error shader not found'); }
+		});
+		
+		// Animation hover
+		function isHover(e) {
+		  return (e.parentElement.querySelector(':hover') === e);
+		}
+		
+		function functionsDescriptionText(entity) {
+			var result = "";
+			for (var i in entity.functions) 
+				result += entity.functions[i].value + "\n\n";
+			return result;
+		}
+
+	/*	setInterval(function() {
+			var element = 'parent0';
+			if (entitiesDictionary[element] != null) {
+				document.getElementById("hoverExpression").innerHTML = functionsDescriptionText(entitiesDictionary[element]);
+				initializeAndDraw(element);
+			}
+			return;
+		}, 150);*/
+	}
+	
+	function createFunctionCallCreateDefaults() {
+		if (defaultEntity == null) {
+			createFunctionGenericGetDefaults({ entityClass: objectClass }, "/getAdminLike");
+		}
+		else {
+			var canvasId = "parent0";
+			entitiesDictionary[canvasId] = deepCopy(defaultEntity);
+			fixFactorizedVars(entitiesDictionary[canvasId]);
+			initializeAndDraw(canvasId);
+		}
+	}
+	
+	function getDelimiters(text, delimiter) {
+		var start = 0, result, results = [];
+		
+		while (true) {
+			result = text.indexOf(delimiter, start);
+			if (result >= 0) {
+				results.push(result);
+				start = result + 1;
+			}
+			else
+				break;
+		}
+		
+		return results;
+	}
+	
+	function getStartDelimiters(text) {
+		return getDelimiters(text, "#{");
+	}
+	
+	function getEndDelimiters(text) {
+		return getDelimiters(text, "}#");
+	}
+	
+	function deepCopy(oldObject) {
+		return jQuery.extend(true, {}, oldObject);
+	}
+	
+	function fixFactorizedVars (entity) {
+		if (getStartDelimiters(entity.code).length > 0) {
+			entity.factorizedCode = entity.code;			
+		}
+		entity.code = getProcessedShader(entity);
+	}
+
+	function createFunctionGenericGetDefaults(arguments, message) {
+		$.ajax({
+			type : 'GET',
+			url : message,
+			data : arguments,
+			dataType : "text",
+			success : function(data) {
+				var result = data.split("|");
+				var canvasId = "parent0";
+				var object = JSON.parse(result[0]);
+				entitiesDictionary[canvasId] = object;
+				fixFactorizedVars(object);
+				initializeAndDraw(canvasId);
+			},
+			error : function(data) {
+				console.log('Call failed');
+			}
+		});
+	}
+	
+	function getFunctionIndex(name) {
+		var functionsCount = entitiesDictionary[name].functions.length;
+		return Math.floor((Math.random() * functionsCount)).toString();
+	}
+	
+	// Scene graphics
+	function initializeAndDraw(canvasId) {
+		initWebGLSceneShaderMutation(canvasId, entitiesDictionary[canvasId]);
+		drawEntityImage();
+	}
+		
+	function initWebGLSceneShaderMutation(canvas, entity) {
+		var canvas = document.getElementById(canvas);
+		initGL(canvas);
+		initBuffersRGB();
+		initShadersShaderMutation(entity)	
+		gl.clearColor(0.0, 0.0, 0.0, 1.0);
+		gl.disable(gl.DEPTH_TEST);
+	}
+	
+	function getProcessedShader(entity) {
+		var result = entity.factorizedCode;
+		for (var i=0; i< entity.functions.length; i++)
+			result = result.replace(entity.functions[i].definition, 
+									entity.functions[i].value);
+		return result;
+	}
+	
+	function initShadersShaderMutation(entity) {
+		var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(vertexShader, myVertexShaderSrc);
+		gl.compileShader(vertexShader);
+		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+		var fragmentShaderCode = entity.code;
+		gl.shaderSource(fragmentShader, fragmentShaderCode);
+		gl.compileShader(fragmentShader);
+		shaderProgram = gl.createProgram();
+		gl.attachShader(shaderProgram, vertexShader);
+		gl.attachShader(shaderProgram, fragmentShader);
+		gl.linkProgram(shaderProgram);
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+			// Show error on console
+			console.log("Could not initialise shaders for " + entity);
+			var errorDescription = gl.getShaderInfoLog(fragmentShader);
+			var lastError = gl.getProgramInfoLog(shaderProgram); 
+			console.log(lastError + " " + errorDescription);
+			entity.error = true;
+			
+			// Draw error image
+			gl.shaderSource(fragmentShader, fragmentErrorShaderSource);
+			gl.compileShader(fragmentShader);
+			gl.linkProgram(shaderProgram);
+			if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS)) {
+				console.log("Can't even show error.");
+				console.log(gl.getShaderInfoLog(fragmentShader));
+			}
+			
+			// Report error
+			$.ajax({
+				type: 'GET',
+				url: "/registerError",
+				data: { description: JSON.stringify(lastError + " " + errorDescription), code: fragmentShaderCode },
+				dataType: "text",
+				success: function(data) { console.log("Error reported");  },
+				error: function(data) { console.log('Error reported call failed'); }
+			});		
+		}
+		gl.useProgram(shaderProgram);
+		shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
+		gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
+		shaderProgram.pMatrixUniform = gl.getUniformLocation(shaderProgram, "uPMatrix");
+		shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
+	}
+	
+	function checkShaderMutation(entity) {
+		var vertexShader = gl.createShader(gl.VERTEX_SHADER);
+		gl.shaderSource(vertexShader, myVertexShaderSrc);
+		gl.compileShader(vertexShader);
+		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
+		fixFactorizedVars(entity);
+		gl.shaderSource(fragmentShader, entity.code);
+		gl.compileShader(fragmentShader);
+		shaderProgram = gl.createProgram();
+		gl.attachShader(shaderProgram, vertexShader);
+		gl.attachShader(shaderProgram, fragmentShader);
+		gl.linkProgram(shaderProgram);
+		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
+			return gl.getShaderInfoLog(fragmentShader);
+		return "";
+	}
+
+	function drawEntityImage () { 
+		globalVa = timerValue();
+		var location = gl.getUniformLocation(shaderProgram, "time");
+		gl.uniform1f(location, globalVa);	
+		gl.viewport(0, 0, gl.viewportWidth, gl.viewportHeight);
+		mat4.perspective(45, gl.viewportWidth / gl.viewportHeight, 0.1, 100.0, pMatrix);
+		mat4.identity(mvMatrix);
+		mat4.translate(mvMatrix, [0.0, 0.0, -1.2]);
+		gl.bindBuffer(gl.ARRAY_BUFFER, squareVertexPositionBuffer);
+		gl.vertexAttribPointer(shaderProgram.vertexPositionAttribute, squareVertexPositionBuffer.itemSize, gl.FLOAT, false, 0, 0);
+		setMatrixUniforms();
+		gl.drawArrays(gl.TRIANGLE_STRIP, 0, squareVertexPositionBuffer.numItems);
+	}
+
+	function setShaderValue() {
+		setShaderValueOf("parent0");
+	}
+
+	function transformIfShaderToyObject(objectCode) {
+		var header = "", footer = "";
+		
+		// Si tiene mainImage y no main, viene de shadertoy
+		if (objectCode.includes("mainImage") && !objectCode.includes("main()")) {
+			header = "precision highp float;\nvarying float xx, yy;\nuniform float time;\nfloat iGlobalTime = time;\nvec2 iResolution = vec2(1.0,1.0);\nvec4 iDate = vec4(0.0, 0.0, 0.0, 0.0);\nvec3 iMouse = vec3(0.0, 0.0, 0.0);\n\n";
+			footer = "\n\nvoid main() {\n\tmainImage(gl_FragColor, vec2(xx, yy));\n}";
+			
+			replaceAll("iDate.w", "iGlobalTime", objectCode);
+		}
+		
+		return header + objectCode + footer;
+	}
+	
+	function setShaderValueOf(canvasId) {	
+		var objectCode = transformIfShaderToyObject(document.getElementById("text-editor").value);
+		entitiesDictionary[canvasId] = {
+			code: objectCode,
+			factorizedCode: objectCode,
+			entityClass: objectClass,
+			functions: parseFunctions(objectCode) };
+		fixFactorizedVars(entitiesDictionary[canvasId]);
+		ensureTranslatedValue(entitiesDictionary[canvasId]);
+		initializeAndDraw(canvasId);
+	}
+	
+
+	//addParentCallBack("parent0");
+	initializeContextMenuOn("parent", "context_menu", menuSetCallback);
+</script>
+{% endblock %}
+
+{% block footerscript %}
+{% parent %}
+{% endblock %}
