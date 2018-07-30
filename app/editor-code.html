@@ -3,7 +3,16 @@
 {% block title %}Evolving shaders{% endblock %}
 
 {% block head %}
-{% parent %}
+	{% parent %}
+	<style type="text/css" media="screen">
+		#editor { 
+			position: absolute;
+			top: 0;
+			right: 0;
+			bottom: 0;
+			left: 0;
+		}
+	</style>
 {% endblock %}	
 
 {% block body %}
@@ -18,7 +27,10 @@
 				<canvas id="parent0" width="384" height="384" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>				
 			</div>
 			<div id="container-pdiv" class="view-container" style="margin-bottom: 5px;">
-				<textarea id="text-editor" class="form-control" style="margin: 0px 0px 10px; width: 555px; height: 375px" rows="60"></textarea>
+				<div id="text-editor" style="margin: 0px 0px 10px; width: 555px; height: 384px">function foo(items) {
+					var x = "All this is syntax highlighted";
+					return x;
+				}</div>
 				<input type="submit" value="Apply" onclick="applyCode()" style="width: 15%; background-color: #5cb85c"/>			
 			</div>
 		</div>
@@ -28,6 +40,7 @@
 {% block mainscript %}
 <script src="jquery-1.11.1.min.js"></script>
 <script src="bootstrap.min.js"></script>
+<script src="/src-min/ace.js"></script>
 
 <script>
 	var entitiesDictionary = {};
@@ -36,6 +49,8 @@
 		objectErrorFile = "/example-scene-mutate-error.c",
 		fragmentErrorShaderSource,
 		defaultEntity = null;
+	var CodeEditor;
+
 
 	function replaceAll(find, replace, str) {
 		return str.replace(new RegExp(find, 'g'), replace);
@@ -65,6 +80,10 @@
 	}
 	
 	function startupDraw() {
+		CodeEditor = ace.edit("text-editor");
+		CodeEditor.setTheme("ace/theme/monokai");
+		CodeEditor.session.setMode("ace/mode/glsl");
+
 		// Read initial shader
 		$.ajax({
 			type: 'GET',
@@ -72,8 +91,8 @@
 			data: { },
 			dataType: "text",
 			success: function(data) { 
-				// Create mdoel from data
-				$("#text-editor")[0].value = data;
+				// Create model from data
+				CodeEditor.setValue(data);
 				createFunctionCallCreateDefaults();
 
 				// Read error shader
@@ -155,7 +174,7 @@
 				var object = JSON.parse(result[0]);
 				entitiesDictionary[canvasId] = object;
 				fixFactorizedVars(object);
-				$("#text-editor")[0].value = object.code;
+				CodeEditor.setValue(object.code);
 				initializeAndDraw(canvasId);
 			},
 			error : function(data) {
@@ -276,7 +295,7 @@
 	function transformIfShaderToyObject(objectCode) {
 		var header = "", footer = "";
 		
-		// Si tiene mainImage y no main, viene de shadertoy
+		// If code has mainImage instead of main: seems to comes from shadertoy
 		if (objectCode.includes("mainImage") && !objectCode.includes("main()")) {
 			header = "precision highp float;\nvarying float xx, yy;\nuniform float time;\nfloat iGlobalTime = time;\nvec2 iResolution = vec2(1.0,1.0);\nvec4 iDate = vec4(0.0, 0.0, 0.0, 0.0);\nvec3 iMouse = vec3(0.0, 0.0, 0.0);\n\n";
 			footer = "\n\nvoid main() {\n\tmainImage(gl_FragColor, vec2(xx, yy));\n}";
@@ -288,7 +307,7 @@
 	}
 	
 	function setShaderValueOf(canvasId) {	
-		var objectCode = transformIfShaderToyObject(document.getElementById("text-editor").value);
+		var objectCode = transformIfShaderToyObject(CodeEditor.getValue());
 		entitiesDictionary[canvasId] = {
 			code: objectCode,
 			factorizedCode: objectCode,
