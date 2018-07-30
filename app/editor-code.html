@@ -56,11 +56,7 @@
 		if (result == "default") alert("Default error");
 		initializeAndDraw(ev.target.id);
 	}
-	
-	function resetParents() {
-		createFunctionCallCreateDefaults();
-	}
-	
+
 	function resetTime() {
 		resetTimer();
 		
@@ -74,47 +70,31 @@
 			type: 'GET',
 			url: objectFile,
 			data: { },
-			async: false,
 			dataType: "text",
 			success: function(data) { 
+				// Create mdoel from data
 				$("#text-editor")[0].value = data;
 				createFunctionCallCreateDefaults();
+
+				// Read error shader
+				$.ajax({
+					type: 'GET',
+					url: objectErrorFile,
+					data: { },
+					dataType: "text",
+					success: function(data) { fragmentErrorShaderSource = data; },
+					error: function(data) { console.log('Error shader not found'); }
+				});
 			},
 			error: function(data) { console.log('Source shader not found'); }
 		});
-		
-		// Read error shader
-		$.ajax({
-			type: 'GET',
-			url: objectErrorFile,
-			data: { },
-			async: false,
-			dataType: "text",
-			success: function(data) { fragmentErrorShaderSource = data; },
-			error: function(data) { console.log('Error shader not found'); }
-		});
-		
-		// Animation hover
-		function isHover(e) {
-		  return (e.parentElement.querySelector(':hover') === e);
-		}
-		
-		function functionsDescriptionText(entity) {
-			var result = "";
-			for (var i in entity.functions) 
-				result += entity.functions[i].value + "\n\n";
-			return result;
-		}
-
-	/*	setInterval(function() {
+		setInterval(function() {
 			var element = 'parent0';
 			if (entitiesDictionary[element] != null) {
-				document.getElementById("hoverExpression").innerHTML = functionsDescriptionText(entitiesDictionary[element]);
 				initializeAndDraw(element);
 			}
 			return;
-		}, 150);*/
-	}
+		}, 150);	}
 	
 	function createFunctionCallCreateDefaults() {
 		if (defaultEntity == null) {
@@ -175,6 +155,7 @@
 				var object = JSON.parse(result[0]);
 				entitiesDictionary[canvasId] = object;
 				fixFactorizedVars(object);
+				$("#text-editor")[0].value = object.code;
 				initializeAndDraw(canvasId);
 			},
 			error : function(data) {
@@ -317,9 +298,65 @@
 		ensureTranslatedValue(entitiesDictionary[canvasId]);
 		initializeAndDraw(canvasId);
 	}
+		
+	function ensureTranslatedValue(entity, errorFunction) {
+		if (errorFunction == null)
+			errorFunction = function(data) { console.log('Source shader not found'); };
+		
+		for (var i=0; i< entity.functions.length; i++) 
+			if ((entity.functions[i].value == "") && (entity.functions[i].valueDSL != ""))
+				$.ajax({
+						type: 'GET',
+						url: "/infixConvert",
+						data: { exp: entity.functions[i].valueDSL },
+						async: false,
+						dataType: "text",
+						success: function(data) { 
+							entity.functions[i].value = data;
+						},
+						error: errorFunction
+				});
+	}
+
+	function parseVars(str) {
+		var result = str.substr(str.indexOf("((") + 1, str.length - 1);
+		return result.split("))")[0].trim() + ")";
+	}
+	
+	function parseFunction(buffer) {
+		var text = buffer.substring(2, buffer.length-2);
+		// #{distortion((vvv0 float xx) (vvv2 float time)) :: EXPONE :: sin(x * 100.0) :: (sin (* x 100.0)) }#"
+		var result = {};
+		var parts = text.split("::");
+		result.name = parts[0].split("(")[0];
+		result.vars = parseVars(parts[0]);
+		result.language = parts[1].trim();
+		result.value = parts[2].trim();
+		result.valueDSL = parts[3].trim();
+		result.definition = buffer;
+		return result;
+	}
+
+	function parseFunctions(text) {
+		var startDelimiters = getStartDelimiters(text);
+		var endDelimiters = getEndDelimiters(text);
+		var functions = [];
+		
+		for (var i=0; i< startDelimiters.length; i++) {
+			var buffer = "";
+			for (var j=startDelimiters[i]; j< endDelimiters[i]+2; j++)
+				buffer += text[j];
+			functions.push(parseFunction(buffer));
+		}
+		
+		return functions;
+	}
+
+	function applyCode() {
+		setShaderValueOf("parent0");
+	}
 	
 
-	//addParentCallBack("parent0");
 	initializeContextMenuOn("parent", "context_menu", menuSetCallback);
 </script>
 {% endblock %}
