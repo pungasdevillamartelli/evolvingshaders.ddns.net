@@ -24,7 +24,11 @@
 	<div class="container" style="padding-top: 60px; width: 950px;">
 		<div id="main-div" style="display: flex">
 			<div style="width: 500px; padding-right: 10px;">
-				<canvas id="parent0" width="384" height="384" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>				
+				<div>
+					<canvas id="parent0" width="384" height="384" draggable="true" ondragstart="drag(event)" ondragover="allowDrop(event)" ondrop="drop(event)"></canvas>				
+				</div>
+				<div id="text-error">
+				</div>
 			</div>
 			<div id="container-pdiv" class="view-container" style="margin-bottom: 5px;">
 				<div id="text-editor" style="margin: 0px 0px 10px; width: 555px; height: 384px">function foo(items) {
@@ -32,6 +36,7 @@
 					return x;
 				}</div>
 				<input type="submit" value="Apply" onclick="applyCode()" style="width: 15%; background-color: #5cb85c"/>			
+				<input type="submit" value="Save" onclick="saveCode()" style="width: 15%; background-color: #5cb85c"/>			
 			</div>
 		</div>
 	</div>
@@ -40,13 +45,14 @@
 {% block mainscript %}
 <script src="jquery-1.11.1.min.js"></script>
 <script src="bootstrap.min.js"></script>
-<script src="/src-min/ace.js"></script>
+<script src="/ace/ace.js"></script>
 
 <script>
 	var entitiesDictionary = {};
 	var objectClass = "entity-shader",
 		objectFile = "/example-scene-mutate-a.c", 
 		objectErrorFile = "/example-scene-mutate-error.c",
+		createObjectUrl = "/createEntity",
 		fragmentErrorShaderSource,
 		defaultEntity = null;
 	var CodeEditor;
@@ -83,6 +89,7 @@
 		CodeEditor = ace.edit("text-editor");
 		CodeEditor.setTheme("ace/theme/monokai");
 		CodeEditor.session.setMode("ace/mode/glsl");
+		CodeEditor.selectAll();
 
 		// Read initial shader
 		$.ajax({
@@ -113,7 +120,7 @@
 				initializeAndDraw(element);
 			}
 			return;
-		}, 150);	}
+		}, 100);	}
 	
 	function createFunctionCallCreateDefaults() {
 		if (defaultEntity == null) {
@@ -230,6 +237,7 @@
 			var lastError = gl.getProgramInfoLog(shaderProgram); 
 			console.log(lastError + " " + errorDescription);
 			entity.error = true;
+			document.getElementById("text-error").innerHTML = errorDescription;
 			
 			// Draw error image
 			gl.shaderSource(fragmentShader, fragmentErrorShaderSource);
@@ -239,17 +247,9 @@
 				console.log("Can't even show error.");
 				console.log(gl.getShaderInfoLog(fragmentShader));
 			}
-			
-			// Report error
-			$.ajax({
-				type: 'GET',
-				url: "/registerError",
-				data: { description: JSON.stringify(lastError + " " + errorDescription), code: fragmentShaderCode },
-				dataType: "text",
-				success: function(data) { console.log("Error reported");  },
-				error: function(data) { console.log('Error reported call failed'); }
-			});		
 		}
+		else
+			document.getElementById("text-error").innerHTML = "";
 		gl.useProgram(shaderProgram);
 		shaderProgram.vertexPositionAttribute = gl.getAttribLocation(shaderProgram, "aVertexPosition");
 		gl.enableVertexAttribArray(shaderProgram.vertexPositionAttribute);
@@ -257,23 +257,6 @@
 		shaderProgram.mvMatrixUniform = gl.getUniformLocation(shaderProgram, "uMVMatrix");
 	}
 	
-	function checkShaderMutation(entity) {
-		var vertexShader = gl.createShader(gl.VERTEX_SHADER);
-		gl.shaderSource(vertexShader, myVertexShaderSrc);
-		gl.compileShader(vertexShader);
-		var fragmentShader = gl.createShader(gl.FRAGMENT_SHADER);
-		fixFactorizedVars(entity);
-		gl.shaderSource(fragmentShader, entity.code);
-		gl.compileShader(fragmentShader);
-		shaderProgram = gl.createProgram();
-		gl.attachShader(shaderProgram, vertexShader);
-		gl.attachShader(shaderProgram, fragmentShader);
-		gl.linkProgram(shaderProgram);
-		if (!gl.getProgramParameter(shaderProgram, gl.LINK_STATUS))
-			return gl.getShaderInfoLog(fragmentShader);
-		return "";
-	}
-
 	function drawEntityImage () { 
 		globalVa = timerValue();
 		var location = gl.getUniformLocation(shaderProgram, "time");
@@ -375,8 +358,20 @@
 		setShaderValueOf("parent0");
 	}
 	
+	function saveCode() {
+		$.ajax({
+			type: 'GET',
+			url: createObjectUrl,
+			data: { entity: JSON.stringify(entitiesDictionary[name]), entityClass: objectClass },
+			dataType: "text",
+			success: function(data) {
+				window.history.pushState(data, 'New entity', '/edit-code.html?id=' + data);
+				console.log("Entity " + data + " saved.");  },
+			error: function(data) { console.log('Like call failed'); }
+		});
+	}
 
-	initializeContextMenuOn("parent", "context_menu", menuSetCallback);
+	//initializeContextMenuOn("parent0", "context_menu", menuSetCallback);
 </script>
 {% endblock %}
 
