@@ -8,13 +8,16 @@ module.exports = {
 	getEntityByIndex: getEntityByIndex,
 	getWithCriteria: getWithCriteria,
 	getAdminLikeWithCriteria: getAdminLikeWithCriteria,
-	deleteEntity: deleteEntity,
 	adminLikeObject: adminLikeObject,
 	adminDislikeObject: adminDislikeObject,
 	likeObject: likeObject,
 	dislikeObject: dislikeObject,
-	registerShaderEntity: registerShaderEntity,
-	registerError: registerError
+	registerError: registerError,
+	getEntity: getEntity,
+	getDbEntity: getDbEntity,
+	createEntity: createEntity,
+	deleteEntity: deleteEntity,
+	saveEntity: saveEntity
 }
 
 
@@ -105,13 +108,6 @@ function getAdminLikeWithCriteria(res, req, args) {
 	}); 
 }
 
-function deleteEntity(res, args) {
-	Entity.remove( { id: args.id }, 
-		function () {
-			res.end(args.id);
-		});
-}
-
 function adminLikeObject(res, args) {
 	var id = uuid.v1();
 	var value = new AdminLike({ id: id, entity: args.entity, entityClass: args.entityClass });
@@ -143,13 +139,6 @@ function dislikeObject(res, args) {
 	res.end(id);
 }
 
-function registerShaderEntity(res, object) {
-	var id = uuid.v1();
-	var value = new Entity({ id: id, object: object.object.toString(), type: "entity-shader" });
-	value.save(printBDError);
-	res.end(id);
-}
-
 function registerError (res, args) {
 	var id = uuid.v1();
 	var value = new ErrorEntry({ id: id, description: args.description, code: args.code });
@@ -161,4 +150,46 @@ function registerError (res, args) {
 function printBDError (err, result) {
       if (err) throw err;
       console.log(result);
+}
+
+// User object functions
+function createEntity (res, args) {
+	var id = uuid.v1();
+	var value = new Entity({ id: id, user: null, entity: args.entity, entityClass: args.entityClass });
+	value.save(printBDError);
+	res.end(id);
+}
+
+function saveEntity (res, args) {
+	Entity.update(
+		{ id: args.id }, 
+		{ user: null, entity: args.entity, entityClass: args.entityClass },
+		{ }, 
+		function (error, count, status) { 
+			if (error == null)
+				res.end("ok");
+			else
+				res.end("error");
+		}
+	);
+}
+
+function getDbEntity (id, done) {
+	var a = Entity.find( { id: id } , done);
+}
+
+function getEntity (res, req, args) {
+	var a = Entity.find(  { id: args.id } , function(err, entities) {
+		var result = entities[0];
+		if (result != null)
+			res.end(result.entity + " | " + result.entityClass + " | " + result.id);
+		else
+			res.end("none");
+	}); 
+}
+
+function deleteEntity (res, args) {
+	Entity.remove( { id: args.id }, 
+		function () { res.end(args.id);	}
+	);
 }

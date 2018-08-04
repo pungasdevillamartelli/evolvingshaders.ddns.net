@@ -72,7 +72,8 @@ module.exports = {
 		
 	},
 	debugIncomingRequest: function(req, pathname, arguments) {
-		console.log(utils.datePrint() + " : " + req.connection.remoteAddress + ": " + pathname + "{" + arguments.toString() + "}");
+		//console.trace();
+		//console.log(utils.datePrint() + " : " + req.connection.remoteAddress + ": " + pathname + "{" + arguments.toString() + "}");
 	}
 };
 

@@ -31,10 +31,7 @@
 				</div>
 			</div>
 			<div id="container-pdiv" class="view-container" style="margin-bottom: 5px;">
-				<div id="text-editor" style="margin: 0px 0px 10px; width: 555px; height: 384px">function foo(items) {
-					var x = "All this is syntax highlighted";
-					return x;
-				}</div>
+				<div id="text-editor" style="margin: 0px 0px 10px; width: 555px; height: 384px">CODECONTENT</div>
 				<input type="submit" value="Apply" onclick="applyCode()" style="width: 15%; background-color: #5cb85c"/>			
 				<input type="submit" value="Save" onclick="saveCode()" style="width: 15%; background-color: #5cb85c"/>			
 			</div>
@@ -53,6 +50,7 @@
 		objectFile = "/example-scene-mutate-a.c", 
 		objectErrorFile = "/example-scene-mutate-error.c",
 		createObjectUrl = "/createEntity",
+		updateObjectUrl = "/saveEntity",
 		fragmentErrorShaderSource,
 		defaultEntity = null;
 	var CodeEditor;
@@ -89,7 +87,6 @@
 		CodeEditor = ace.edit("text-editor");
 		CodeEditor.setTheme("ace/theme/monokai");
 		CodeEditor.session.setMode("ace/mode/glsl");
-		CodeEditor.selectAll();
 
 		// Read initial shader
 		$.ajax({
@@ -108,12 +105,17 @@
 					url: objectErrorFile,
 					data: { },
 					dataType: "text",
-					success: function(data) { fragmentErrorShaderSource = data; },
+					success: function(data) { 
+						fragmentErrorShaderSource = data; },
 					error: function(data) { console.log('Error shader not found'); }
 				});
 			},
-			error: function(data) { console.log('Source shader not found'); }
+			error: function(data) { 
+				CodeEditor.clearSelection();
+				console.log('Source shader not found'); }
 		});
+
+		// Set animation hook
 		setInterval(function() {
 			var element = 'parent0';
 			if (entitiesDictionary[element] != null) {
@@ -123,15 +125,12 @@
 		}, 100);	}
 	
 	function createFunctionCallCreateDefaults() {
-		if (defaultEntity == null) {
+		var id = getURLParameter('id');
+
+		if (id == null) 
 			createFunctionGenericGetDefaults({ entityClass: objectClass }, "/getAdminLike");
-		}
-		else {
-			var canvasId = "parent0";
-			entitiesDictionary[canvasId] = deepCopy(defaultEntity);
-			fixFactorizedVars(entitiesDictionary[canvasId]);
-			initializeAndDraw(canvasId);
-		}
+		else 
+			createFunctionGenericGetId({ id: id }, "/entity");
 	}
 	
 	function getDelimiters(text, delimiter) {
@@ -169,6 +168,30 @@
 		entity.code = getProcessedShader(entity);
 	}
 
+	function createFunctionGenericGetId(arguments, message) {
+		$.ajax({
+			type : 'GET',
+			url : message,
+			data : arguments,
+			dataType : "text",
+			success : function(data) {
+				var result = data.split("|");
+				var canvasId = "parent0";
+				var object = JSON.parse(result[0]);
+				entitiesDictionary[canvasId] = object;
+				entitiesDictionary[canvasId].id = result[2].trim();
+				createFunctionGenericGetId
+				fixFactorizedVars(object);
+				CodeEditor.setValue(object.code);
+				initializeAndDraw(canvasId);
+				CodeEditor.clearSelection();
+			},
+			error : function(data) {
+				console.log('Call failed');
+			}
+		});
+	}
+
 	function createFunctionGenericGetDefaults(arguments, message) {
 		$.ajax({
 			type : 'GET',
@@ -180,9 +203,11 @@
 				var canvasId = "parent0";
 				var object = JSON.parse(result[0]);
 				entitiesDictionary[canvasId] = object;
+				entitiesDictionary[canvasId].id = result[2].trim();
 				fixFactorizedVars(object);
 				CodeEditor.setValue(object.code);
 				initializeAndDraw(canvasId);
+				CodeEditor.clearSelection();
 			},
 			error : function(data) {
 				console.log('Call failed');
@@ -200,7 +225,7 @@
 		initWebGLSceneShaderMutation(canvasId, entitiesDictionary[canvasId]);
 		drawEntityImage();
 	}
-		
+	
 	function initWebGLSceneShaderMutation(canvas, entity) {
 		var canvas = document.getElementById(canvas);
 		initGL(canvas);
@@ -291,7 +316,9 @@
 	
 	function setShaderValueOf(canvasId) {	
 		var objectCode = transformIfShaderToyObject(CodeEditor.getValue());
+	
 		entitiesDictionary[canvasId] = {
+			id: entitiesDictionary[canvasId].id,
 			code: objectCode,
 			factorizedCode: objectCode,
 			entityClass: objectClass,
@@ -359,15 +386,48 @@
 	}
 	
 	function saveCode() {
+		var id = getURLParameter('id');
+		if (id == null)
+			saveNewCode();
+		else
+			saveUpdateCode();
+	}
+
+	function saveNewCode() {
+		var entity = entitiesDictionary["parent0"];
+
 		$.ajax({
 			type: 'GET',
 			url: createObjectUrl,
-			data: { entity: JSON.stringify(entitiesDictionary[name]), entityClass: objectClass },
+			data: { 
+				id: entity.id,
+				entity: JSON.stringify(entity), 
+				entityClass: objectClass 
+			},
 			dataType: "text",
 			success: function(data) {
-				window.history.pushState(data, 'New entity', '/edit-code.html?id=' + data);
-				console.log("Entity " + data + " saved.");  },
-			error: function(data) { console.log('Like call failed'); }
+				entity.id = data;
+				window.history.pushState(data, 'New entity', '/editor-code.html?id=' + data);
+				console.log("Entity " + data + " created.");  },
+			error: function(data) { console.log('Create call failed'); }
+		});
+	}
+
+	function saveUpdateCode() {
+		var entity = entitiesDictionary["parent0"];
+
+		$.ajax({
+			type: 'GET',
+			url: updateObjectUrl,
+			data: { 
+				id: entity.id, 
+				entity: JSON.stringify(entity), 
+				entityClass: objectClass 
+			},
+			dataType: "text",
+			success: function(data) {
+				console.log("Entity " + data + " updated.");  },
+			error: function(data) { console.log('Update call failed'); }
 		});
 	}
 
